@@ -5,6 +5,7 @@ import websockets
 import json
 from app.database import init_db, save_player, load_player
 from app.game_logic import handle_action
+from waitress import serve
 
 # Flask app for serving the web client
 flask_app = Flask(__name__)
@@ -51,8 +52,9 @@ async def websocket_handler(websocket, path):
 
 # Run Flask and WebSocket server concurrently
 def run_flask():
-    """Run the Flask server."""
-    flask_app.run(host="0.0.0.0", port=5001)
+    """Run the Flask app using Waitress."""
+    print("Starting Flask server with Waitress on http://0.0.0.0:5001")
+    serve(flask_app, host="0.0.0.0", port=5001)
 
 async def run_websocket():
     """Run the WebSocket server."""
