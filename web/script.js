@@ -9,7 +9,7 @@ const wsUrl =
         : `wss://${window.location.hostname}/ws`;
 
 console.log(`Connecting to WebSocket server at: ${wsUrl}`);
-const ws = new WebSocket(wsUrl);
+const ws = new WebSocket(wsUrl)
 
 // Handle WebSocket connection events
 ws.onopen = () => {

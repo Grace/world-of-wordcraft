@@ -1,4 +1,5 @@
 from flask import Flask, send_from_directory, request
+from flask_cors import CORS
 from flask_sockets import Sockets
 import threading
 import asyncio
@@ -8,6 +9,10 @@ from app.game_logic import handle_action
 from waitress import serve
 from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
+
+# Enable CORS for Flask app
+CORS(flask_app, resources={r"/*": {"origins": "*"}})
+
 
 # Flask app for serving the web client
 flask_app = Flask(__name__)
@@ -33,6 +38,8 @@ def static_files(filename):
 def websocket_handler(ws):
     """Handle WebSocket connections."""
     print("New WebSocket connection received.")
+    origin = request.headers.get("Origin", "Unknown")
+    print(f"WebSocket connection attempted from origin: {origin}")
     try:
         ws.send(json.dumps({"message": "Enter your name:"}))
         player_name = ws.receive()
