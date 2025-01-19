@@ -1,5 +1,5 @@
 # World of Wordcraft
-An open-source, text-based MMORPG designed to be screen-reader friendly. In-game worldbuilding generated with OpenAI.
+An open-source, text-based MMORPG designed for screen readers. In-game worldbuilding generated with OpenAI.
 
 ## Demo
 [https://world-of-wordcraft-production.up.railway.app/](https://world-of-wordcraft-production.up.railway.app/)
