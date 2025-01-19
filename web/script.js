@@ -2,16 +2,24 @@ const output = document.getElementById('output');
 const input = document.getElementById('input');
 const sendButton = document.getElementById('send');
 
-// Dynamically determine the WebSocket URL based on the environment
-const wsUrl =
+// Dynamically determine WebSocket URL
+const wsUrl = 
     window.location.protocol === "https:"
     ? `wss://${window.location.host}/ws`
     : `ws://${window.location.host}/ws`;
 
 console.log(`Connecting to WebSocket server at: ${wsUrl}`);
-const ws = new WebSocket(wsUrl)
+const ws = new WebSocket(wsUrl);
 
-// Handle WebSocket connection events
+// Append a message to the output log
+function appendToOutput(message) {
+    const paragraph = document.createElement('p');
+    paragraph.textContent = message;
+    output.appendChild(paragraph);
+    output.scrollTop = output.scrollHeight; // Scroll to the bottom
+}
+
+// Handle WebSocket events
 ws.onopen = () => {
     console.log("WebSocket connection established.");
     appendToOutput("Connected to the server.");
@@ -23,7 +31,7 @@ ws.onerror = (error) => {
 };
 
 ws.onmessage = (event) => {
-    const data = JSON.parse(event.data); // Parse server response
+    const data = JSON.parse(event.data);
     appendToOutput(data.message);
 };
 
@@ -32,14 +40,7 @@ ws.onclose = () => {
     appendToOutput("Disconnected from the server.");
 };
 
-// Send a message to the server when the button is clicked or Enter is pressed
-sendButton.addEventListener('click', sendMessage);
-input.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
-        sendMessage();
-    }
-});
-
+// Send message to the server
 function sendMessage() {
     const command = input.value.trim();
     if (command && ws.readyState === WebSocket.OPEN) {
@@ -55,9 +56,11 @@ function sendMessage() {
     }
 }
 
-function appendToOutput(message) {
-    const paragraph = document.createElement('p');
-    paragraph.textContent = message;
-    output.appendChild(paragraph);
-    output.scrollTop = output.scrollHeight; // Scroll to the bottom of the output
-}
+// Event listeners
+sendButton.addEventListener('click', sendMessage);
+input.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent the default form submission
+        sendMessage(); // Trigger the same logic as the Send button
+    }
+});

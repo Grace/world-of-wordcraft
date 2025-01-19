@@ -7,12 +7,24 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="game">
-        <h1>World of Wordcraft</h1>
-        <div id="output" aria-live="polite" aria-atomic="true"></div> <!-- Output history -->
-        <input id="input" type="text" placeholder="Type your command here..." autocomplete="off">
-        <button id="send">Send</button>
-    </div>
+    <main id="game">
+        <h1 id="title" tabindex="0">World of Wordcraft</h1>
+        <section id="output-container" aria-labelledby="output-label">
+            <h2 id="output-label" class="sr-only">Game Messages</h2>
+            <div id="output" aria-live="polite" aria-atomic="true" tabindex="0"></div>
+        </section>
+        <form id="input-form" aria-labelledby="input-label">
+            <label id="input-label" for="input" class="sr-only">Command Input</label>
+            <input 
+                id="input" 
+                type="text" 
+                placeholder="Type your command here..." 
+                autocomplete="off" 
+                aria-describedby="input-instructions">
+            <button id="send" type="button" aria-label="Send Command">Send</button>
+            <p id="input-instructions" class="sr-only">Press Enter or click Send to submit your command.</p>
+        </form>
+    </main>
     <script src="script.js"></script>
 </body>
 </html>
