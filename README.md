@@ -1,6 +1,9 @@
 # World of Wordcraft
 A text-based MMORPG designed to be screen reader friendly.
 
+## Demo
+[https://world-of-wordcraft-production.up.railway.app/](https://world-of-wordcraft-production.up.railway.app/)
+
 ## Features
 - Screen-reader-friendly gameplay.
 - Dynamic room generation with OpenAI.
