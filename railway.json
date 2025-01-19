@@ -1,0 +1,9 @@
+{
+    "build": {
+      "dockerfilePath": "Dockerfile"
+    },
+    "deploy": {
+      "startCommand": "python app/server.py"
+    }
+  }
+  
