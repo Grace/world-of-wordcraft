@@ -32,9 +32,11 @@ def static_files(filename):
 @sockets.route('/ws')
 def websocket_handler(ws):
     """Handle WebSocket connections."""
+    print("New WebSocket connection received.")
     try:
         ws.send(json.dumps({"message": "Enter your name:"}))
         player_name = ws.receive()
+        print(f"Player name received: {player_name}")
         player_id = str(request.remote_addr)
         player = load_player(player_id) or {
             "id": player_id,
@@ -61,6 +63,7 @@ def websocket_handler(ws):
         if player_id in connected_clients:
             del connected_clients[player_id]
             print(f"Client {player_id} disconnected.")
+        print("WebSocket connection closed.")
 
 
 def run_server():
