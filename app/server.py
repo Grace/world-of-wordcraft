@@ -10,13 +10,15 @@ from waitress import serve
 from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
 
-# Enable CORS for Flask app
-CORS(flask_app, resources={r"/*": {"origins": "*"}})
-
 
 # Flask app for serving the web client
 flask_app = Flask(__name__)
-sockets = Sockets(flask_app)  # Add WebSocket support to Flask
+
+# Enable CORS for Flask app
+CORS(flask_app, resources={r"/*": {"origins": "*"}})
+
+# Add WebSocket support to Flask
+sockets = Sockets(flask_app)
 
 # Dictionary to store connected WebSocket clients
 connected_clients = {}
