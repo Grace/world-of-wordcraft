@@ -2,8 +2,8 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pathlib import Path
-from app.database import load_player, save_player, update_player_location, get_players_in_room
-from app.game_logic import handle_action, get_room, get_players_in_room, generate_room_description
+from app.database import init_db, load_player, save_player, update_player_location, get_players_in_room
+from app.game_logic import handle_action, get_players_in_room
 
 # Base directory for static files
 WEB_DIR = Path(__file__).parent.parent / "web"
@@ -102,6 +102,9 @@ async def websocket_endpoint(websocket: WebSocket):
 
 if __name__ == "__main__":
     import uvicorn
+
+    # Initialize the database
+    init_db()
 
     print("Starting server on http://0.0.0.0:5001")
     uvicorn.run(fastapi_app, host="0.0.0.0", port=5001)

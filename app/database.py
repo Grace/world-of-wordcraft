@@ -1,28 +1,45 @@
 import sqlite3
-import json
+import os
 
 DB_FILE = "game.db"
 
 def init_db():
-    """Initialize the database and create necessary tables."""
+    """Initialize the database and create tables if they do not exist."""
+    if not os.path.exists(DB_FILE):
+        print("Database file not found. Creating a new one...")
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
+
     # Create players table
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS players (
-            id TEXT PRIMARY KEY,
-            data TEXT
-        )
+    CREATE TABLE IF NOT EXISTS players (
+        id TEXT PRIMARY KEY,
+        name TEXT,
+        location_x INTEGER,
+        location_y INTEGER,
+        location_z INTEGER,
+        inventory TEXT
+    )
     """)
+
     # Create rooms table
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS rooms (
-            coordinates TEXT PRIMARY KEY,
-            data TEXT
-        )
+    CREATE TABLE IF NOT EXISTS rooms (
+        coordinates TEXT PRIMARY KEY,
+        description TEXT,
+        exits TEXT,
+        puzzle TEXT,
+        npc TEXT,
+        items TEXT
+    )
     """)
+
     conn.commit()
     conn.close()
+
+def get_connection():
+    """Get a database connection."""
+    return sqlite3.connect(DB_FILE)
 
 def save_room(coordinates, room_data):
     """Save a room to the database."""
