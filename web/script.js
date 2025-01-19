@@ -4,9 +4,9 @@ const sendButton = document.getElementById('send');
 
 // Dynamically determine the WebSocket URL based on the environment
 const wsUrl =
-    window.location.hostname === "world-of-wordcraft-production.up.railway.app"
-        ? "wss://world-of-wordcraft-production.up.railway.app:8765" // Production URL with WebSocket Secure (wss)
-        : "ws://localhost:8765"; // Development URL
+    window.location.hostname === "localhost"
+        ? "ws://localhost:5001/ws"
+        : `wss://${window.location.hostname}/ws`;
 
 console.log(`Connecting to WebSocket server at: ${wsUrl}`);
 const ws = new WebSocket(wsUrl);

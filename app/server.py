@@ -1,71 +1,75 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request
+from flask_sockets import Sockets
 import threading
 import asyncio
-import websockets
 import json
 from app.database import init_db, save_player, load_player
 from app.game_logic import handle_action
 from waitress import serve
+from gevent import pywsgi
+from geventwebsocket.handler import WebSocketHandler
 
 # Flask app for serving the web client
 flask_app = Flask(__name__)
+sockets = Sockets(flask_app)  # Add WebSocket support to Flask
+
+# Dictionary to store connected WebSocket clients
+connected_clients = {}
+
 
 @flask_app.route('/')
 def index():
     """Serve the main HTML file."""
     return send_from_directory('../web', 'index.html')
 
+
 @flask_app.route('/<path:filename>')
 def static_files(filename):
     """Serve static files like CSS and JavaScript."""
     return send_from_directory('../web', filename)
 
-# WebSocket server for the game
-connected_clients = {}
 
-async def websocket_handler(websocket, path):
+@sockets.route('/ws')
+def websocket_handler(ws):
     """Handle WebSocket connections."""
     try:
-        await websocket.send(json.dumps({"message": "Enter your name:"}))
-        player_name = await websocket.recv()
-        player_id = str(websocket.remote_address)
+        ws.send(json.dumps({"message": "Enter your name:"}))
+        player_name = ws.receive()
+        player_id = str(request.remote_addr)
         player = load_player(player_id) or {
             "id": player_id,
             "name": player_name,
             "location": (0, 0, 0),
-            "inventory": []
+            "inventory": [],
         }
         save_player(player_id, player)
-        connected_clients[player_id] = websocket
+        connected_clients[player_id] = ws
 
-        await websocket.send(json.dumps({"message": f"Welcome {player_name}! Type 'look' to start."}))
+        ws.send(json.dumps({"message": f"Welcome {player_name}! Type 'look' to start."}))
 
-        while True:
-            command = await websocket.recv()
+        while not ws.closed:
+            command = ws.receive()
             print(f"Command received: {command}")  # Log the command for debugging
-            response = handle_action(player, command)
-            await websocket.send(json.dumps({"message": response}))
-    except websockets.exceptions.ConnectionClosed:
-        print("A client disconnected.")
+            if command:
+                response = handle_action(player, command)
+                ws.send(json.dumps({"message": response}))
+
+    except Exception as e:
+        print(f"WebSocket error: {e}")
+
     finally:
-        connected_clients.pop(player_id, None)
+        if player_id in connected_clients:
+            del connected_clients[player_id]
+            print(f"Client {player_id} disconnected.")
 
-# Run Flask and WebSocket server concurrently
-def run_flask():
-    """Run the Flask app using Waitress."""
-    print("Starting Flask server with Waitress on http://0.0.0.0:5001")
-    serve(flask_app, host="0.0.0.0", port=5001)
 
-async def run_websocket():
-    """Run the WebSocket server."""
-    print("Starting WebSocket server on ws://0.0.0.0:8765")
-    init_db()  # Ensure the database is initialized
-    server = await websockets.serve(websocket_handler, "0.0.0.0", 8765)
-    await server.wait_closed()
+def run_server():
+    """Run the Flask app with WebSocket support using gevent."""
+    init_db()
+    print("Starting server with WebSocket support on http://0.0.0.0:5001")
+    server = pywsgi.WSGIServer(("0.0.0.0", 5001), flask_app, handler_class=WebSocketHandler)
+    server.serve_forever()
+
 
 if __name__ == "__main__":
-    # Start Flask server in a separate thread
-    threading.Thread(target=run_flask, daemon=True).start()
-
-    # Start WebSocket server in the main event loop
-    asyncio.run(run_websocket())
+    run_server()
