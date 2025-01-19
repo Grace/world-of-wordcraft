@@ -8,5 +8,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app/ /app/app
 COPY web/ /app/web
 
-EXPOSE 5001 8765
+EXPOSE 5001
 CMD CMD ["python", "-m", "app.server"]

@@ -4,6 +4,6 @@
   },
   "deploy": {
     "startCommand": "python -m app.server",
-    "exposedPorts": [5001, 8765]
+    "exposedPorts": [5001]
   }
 }
