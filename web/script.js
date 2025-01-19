@@ -2,10 +2,16 @@ const output = document.getElementById('output');
 const input = document.getElementById('input');
 const sendButton = document.getElementById('send');
 
-console.log("Connecting to WebSocket server...");
-const ws = new WebSocket('ws://localhost:8765'); // Update to match your server URL
+// Dynamically determine the WebSocket URL based on the environment
+const wsUrl =
+    window.location.hostname === "world-of-wordcraft-production.up.railway.app"
+        ? "wss://world-of-wordcraft-production.up.railway.app:8765" // Production URL with WebSocket Secure (wss)
+        : "ws://localhost:8765"; // Development URL
 
-// Log WebSocket connection status
+console.log(`Connecting to WebSocket server at: ${wsUrl}`);
+const ws = new WebSocket(wsUrl);
+
+// Handle WebSocket connection events
 ws.onopen = () => {
     console.log("WebSocket connection established.");
     appendToOutput("Connected to the server.");
@@ -17,8 +23,7 @@ ws.onerror = (error) => {
 };
 
 ws.onmessage = (event) => {
-    console.log("Message received from server:", event.data);
-    const data = JSON.parse(event.data);
+    const data = JSON.parse(event.data); // Parse server response
     appendToOutput(data.message);
 };
 
@@ -27,7 +32,7 @@ ws.onclose = () => {
     appendToOutput("Disconnected from the server.");
 };
 
-// Add event listeners for the Send button and Enter key
+// Send a message to the server when the button is clicked or Enter is pressed
 sendButton.addEventListener('click', sendMessage);
 input.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
@@ -38,9 +43,9 @@ input.addEventListener('keypress', (event) => {
 function sendMessage() {
     const command = input.value.trim();
     if (command && ws.readyState === WebSocket.OPEN) {
-        console.log("Sending command:", command);
-        appendToOutput(`> ${command}`); // Show command in the output history
-        ws.send(command); // Send command to the server
+        console.log(`Sending command: ${command}`);
+        appendToOutput(`> ${command}`); // Display the command in the output
+        ws.send(command); // Send the command to the server
         input.value = ''; // Clear the input box
     } else if (!command) {
         console.warn("Command is empty.");
@@ -54,5 +59,5 @@ function appendToOutput(message) {
     const paragraph = document.createElement('p');
     paragraph.textContent = message;
     output.appendChild(paragraph);
-    output.scrollTop = output.scrollHeight;
+    output.scrollTop = output.scrollHeight; // Scroll to the bottom of the output
 }
