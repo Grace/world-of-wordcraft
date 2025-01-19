@@ -15,4 +15,4 @@ A text-based MMORPG designed to be screen reader friendly.
 ## Local Development
 1. Install dependencies: `pip install -r requirements.txt`.
 2. Run the server: `python app/server.py`.
-3. Connect to `ws://localhost:8765` using a WebSocket client.
+3. Connect to `ws://localhost:8765` using a WebSocket client or point your browser to `localhost:5001`.
