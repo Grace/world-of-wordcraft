@@ -5,7 +5,7 @@ Proof of concept for an open-source, text-based MMORPG designed for screen reade
 Link to play the game in your browser: [https://world-of-wordcraft-production.up.railway.app/](https://world-of-wordcraft-production.up.railway.app/)
 
 ## Features
-- Screen-reader-friendly gameplay.
+- Screen-reader friendly gameplay (work in progress, need feedback from daily screen reader users).
 - Dynamic room generation with OpenAI.
 - NPCs with dialogues and items.
 - Player inventory and trading system.
