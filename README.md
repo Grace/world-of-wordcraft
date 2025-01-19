@@ -17,5 +17,5 @@ Link to play the game in your browser: [https://world-of-wordcraft-production.up
 
 ## Local Development
 1. Install dependencies: `pip install -r requirements.txt`.
-2. Run the server: `python app/server.py`.
-3. Connect to `ws://localhost:8765` using a WebSocket client or point your browser to `localhost:5001`.
+2. Run the server: `python -m app.server.py`.
+3. Connect to `ws://localhost:5001` using a WebSocket client like `wscat` or point your browser to `localhost:5001`.
