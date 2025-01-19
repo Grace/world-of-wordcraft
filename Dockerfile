@@ -9,4 +9,4 @@ COPY app/ /app/app
 COPY web/ /app/web
 
 EXPOSE 5001 8765
-CMD ["python", "app/server.py"]
+CMD CMD ["python", "-m", "app.server"]
