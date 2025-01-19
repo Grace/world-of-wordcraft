@@ -4,9 +4,9 @@ const sendButton = document.getElementById('send');
 
 // Dynamically determine the WebSocket URL based on the environment
 const wsUrl =
-    window.location.hostname === "localhost"
-        ? "ws://localhost:5001/ws"
-        : `wss://${window.location.hostname}/ws`;
+    window.location.protocol === "https:"
+    ? `wss://${window.location.host}/ws`
+    : `ws://${window.location.host}/ws`;
 
 console.log(`Connecting to WebSocket server at: ${wsUrl}`);
 const ws = new WebSocket(wsUrl)
