@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import json
 
 DB_FILE = "game.db"
 
@@ -46,35 +47,51 @@ def save_room(coordinates, room_data):
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT OR REPLACE INTO rooms (coordinates, data) VALUES (?, ?)
-    """, (json.dumps(coordinates), json.dumps(room_data)))
+        INSERT OR REPLACE INTO rooms (coordinates, description, exits, puzzle, npc, items)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        json.dumps(coordinates),
+        room_data["description"],
+        json.dumps(room_data["exits"]),
+        room_data.get("puzzle"),
+        json.dumps(room_data.get("npc", [])),
+        json.dumps(room_data.get("items", []))
+    ))
     conn.commit()
     conn.close()
 
 def get_room(coordinates):
-    """
-    Retrieve a room from the database by its coordinates.
-
-    Args:
-        coordinates (tuple): The (x, y, z) coordinates of the room.
-
-    Returns:
-        dict: The room data if found, or None if the room does not exist.
-    """
+    """Retrieve a room from the database by its coordinates."""
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    cursor.execute("SELECT data FROM rooms WHERE coordinates = ?", (json.dumps(coordinates),))
+    cursor.execute("SELECT description, exits, puzzle, npc, items FROM rooms WHERE coordinates = ?", (json.dumps(coordinates),))
     result = cursor.fetchone()
     conn.close()
-    return json.loads(result[0]) if result else None
+    if result:
+        return {
+            "description": result[0],
+            "exits": json.loads(result[1]),
+            "puzzle": result[2],
+            "npc": json.loads(result[3]),
+            "items": json.loads(result[4]),
+        }
+    return None
 
 def save_player(player_id, player_data):
     """Save a player's data to the database."""
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT OR REPLACE INTO players (id, data) VALUES (?, ?)
-    """, (player_id, json.dumps(player_data)))
+        INSERT OR REPLACE INTO players (id, name, location_x, location_y, location_z, inventory)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        player_id,
+        player_data["name"],
+        player_data["location"][0],
+        player_data["location"][1],
+        player_data["location"][2],
+        json.dumps(player_data.get("inventory", []))
+    ))
     conn.commit()
     conn.close()
 
@@ -82,10 +99,21 @@ def load_player(player_id):
     """Load a player's data from the database."""
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    cursor.execute("SELECT data FROM players WHERE id = ?", (player_id,))
+    cursor.execute("""
+        SELECT name, location_x, location_y, location_z, inventory
+        FROM players
+        WHERE id = ?
+    """, (player_id,))
     result = cursor.fetchone()
     conn.close()
-    return json.loads(result[0]) if result else None
+    if result:
+        return {
+            "id": player_id,
+            "name": result[0],
+            "location": (result[1], result[2], result[3]),
+            "inventory": json.loads(result[4]),
+        }
+    return None
 
 def get_players_in_room(location, exclude=None):
     """
@@ -100,16 +128,15 @@ def get_players_in_room(location, exclude=None):
     """
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    cursor.execute("SELECT data FROM players")
+    cursor.execute("""
+        SELECT name
+        FROM players
+        WHERE location_x = ? AND location_y = ? AND location_z = ?
+    """, location)
     players = cursor.fetchall()
     conn.close()
 
-    players_in_room = []
-    for player_data in players:
-        player = json.loads(player_data[0])
-        if tuple(player["location"]) == tuple(location) and player["id"] != exclude:
-            players_in_room.append(player["name"])
-    return players_in_room
+    return [player[0] for player in players if player[0] != exclude]
 
 def update_player_location(player_id, location):
     """
@@ -121,13 +148,10 @@ def update_player_location(player_id, location):
     """
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    cursor.execute("SELECT data FROM players WHERE id = ?", (player_id,))
-    result = cursor.fetchone()
-    if result:
-        player = json.loads(result[0])
-        player["location"] = location
-        cursor.execute("""
-            INSERT OR REPLACE INTO players (id, data) VALUES (?, ?)
-        """, (player_id, json.dumps(player)))
+    cursor.execute("""
+        UPDATE players
+        SET location_x = ?, location_y = ?, location_z = ?
+        WHERE id = ?
+    """, (*location, player_id))
     conn.commit()
     conn.close()
