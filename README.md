@@ -21,3 +21,6 @@ If you get disconnected or run into an error, refresh the page and try again in 
 1. Install dependencies: `pip install -r requirements.txt`.
 2. Run the server: `python -m app.server.py`.
 3. Connect to `ws://localhost:5001` using a WebSocket client like `wscat` or point your browser to `localhost:5001`.
+
+## Extra Goals
+- [ ] Make room generation be based on exits described in previously generated, connected rooms
