@@ -96,6 +96,9 @@ async def websocket_endpoint(websocket: WebSocket):
         if not player:
             return
 
+        # Add to connected clients
+        connected_clients[player_id] = websocket
+
         # Game loop
         while True:
             command = await websocket.receive_text()
@@ -113,6 +116,8 @@ async def websocket_endpoint(websocket: WebSocket):
                     })
 
     except WebSocketDisconnect:
+        if player:
+            del connected_clients[player['id']]
         print(f"Client {player['id'] if player else 'unknown'} disconnected")
     finally:
         if player:

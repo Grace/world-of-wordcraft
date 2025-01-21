@@ -44,12 +44,10 @@ class ActionHandler:
         players = get_players_in_room(player["location"], exclude=player["id"])
         
         # Format player list if any others present
-        other_players = f"\nOther players here: {', '.join(players)}\n" if players else "\n"
+        other_players = f"\nOther players here: {', '.join(players)}" if players else ""
         
-        # Format NPC list
+        # Format NPC and item lists
         npcs = "\nNPCs: " + (", ".join([npc["name"] for npc in room.get("npcs", [])]) or "none")
-        
-        # Format item list
         items = "\nItems: " + (", ".join([item["name"] for item in room.get("items", [])]) or "none")
         
         return f"{room['description']}{other_players}{npcs}{items}"

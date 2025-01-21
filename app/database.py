@@ -100,24 +100,18 @@ def load_player(player_id):
         conn.close()
 
 def get_players_in_room(location, exclude=None):
-    """
-    Get a list of players in a specific room.
-
-    Args:
-        location (tuple): The (x, y, z) coordinates of the room.
-        exclude (str): The player ID to exclude from the results.
-
-    Returns:
-        list: A list of player names in the room.
-    """
+    """Get players in room excluding current player."""
     conn = get_connection()
     cursor = conn.cursor()
     
     try:
         x, y, z = location
         cursor.execute("""
-            SELECT name FROM players 
-            WHERE location_x = ? AND location_y = ? AND location_z = ? 
+            SELECT name_original 
+            FROM players 
+            WHERE location_x = ? 
+            AND location_y = ? 
+            AND location_z = ? 
             AND id != ?
         """, (x, y, z, exclude))
         
