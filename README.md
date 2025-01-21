@@ -1,9 +1,14 @@
 # World of Wordcraft
 
-## Game Demo
-Link to play the game in your browser: [https://world-of-wordcraft.up.railway.app/](https://world-of-wordcraft.up.railway.app/)
+## Game Demo  
+[Play the Game in Your Browser](https://world-of-wordcraft.up.railway.app/)  
 
-If you get disconnected or run into an error, refresh the page and try again in a minute. The app goes to sleep based on traffic.
+Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! This open-source project allows players to explore a procedurally generated world of words and interact in real time.
+
+**Note:**  
+- If you encounter disconnections or errors, simply refresh the page and try again after a minute. The app may go into sleep mode during periods of low traffic to conserve resources.  
+- For the best experience, use a modern browser with WebSocket support enabled.
+
 
 ## Description
 A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as MUDs) designed for accessibility. In-game worldbuilding generated with OpenAI.
