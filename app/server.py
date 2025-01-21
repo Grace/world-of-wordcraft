@@ -139,7 +139,7 @@ async def websocket_endpoint(websocket: WebSocket):
         # Initial auth request
         await websocket.send_json({
             "type": "auth_request",
-            "message": "Enter 'login <name> <password>' or 'register <name> <password>'.\nAvailable commands:\n- highcontrast on/off\n- fontsize <number>"
+            "message": "Enter 'login <name> <password>' or 'register <name> <password>'.\n\nAvailable accessibility commands:\n- highcontrast on/off\n- fontsize <number>"
         })
         
         while True:
