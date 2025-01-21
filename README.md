@@ -26,6 +26,7 @@ A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as M
 3. Connect to `ws://localhost:5001` using a WebSocket client like `wscat` or point your browser to `localhost:5001`.
 
 ## Extra Goals
+- [ ] Create game engine to make everything else on this to-do list more managable
 - [ ] Make room generation be based on exits described in previously generated, connected rooms
 - [ ] Implement help command for more information about other commands
 - [x] Add roles such as moderator and admin with varying priviledges
