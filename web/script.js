@@ -37,11 +37,15 @@ ws.onmessage = (event) => {
         if (data.type === "auth_request") {
             appendToOutput(data.message);
         } else if (data.type === "auth_success") {
-            appendToOutput(`Login successful: ${data.message}`);
-        } else if (data.type === "error") {
-            appendToOutput(`Error: ${data.message}`);
+            appendToOutput(data.message);
+        } else if (data.type === "theme") {
+            document.documentElement.setAttribute('data-theme', data.theme);
+            localStorage.setItem('theme', data.theme);
+            appendToOutput(data.message);
         } else if (data.type === "game_message") {
             appendToOutput(data.message);
+        } else if (data.type === "error") {
+            appendToOutput(`Error: ${data.message}`);
         }
     } catch (error) {
         console.error("Failed to parse message:", error);
@@ -53,6 +57,10 @@ ws.onclose = () => {
     console.log("WebSocket connection closed.");
     appendToOutput("Disconnected from the server.");
 };
+
+// Initialize theme from localStorage
+const savedTheme = localStorage.getItem('theme') || 'default';
+document.documentElement.setAttribute('data-theme', savedTheme);
 
 // Send message to the server
 function sendMessage() {

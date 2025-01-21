@@ -32,7 +32,7 @@ async def index():
 async def static_files(filename: str):
     """Serve static files from the web directory."""
     file_path = WEB_DIR / filename
-    if file_path.exists():
+    if (file_path.exists()):
         return FileResponse(file_path)
     return {"error": "File not found"}, 404
 
@@ -106,8 +106,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 try:
                     response = game_logic.handle_action(player, command)
                     
+                    # Handle theme changes
+                    if isinstance(response, dict) and response["type"] == "theme":
+                        await websocket.send_json(response)
                     # Handle logout command
-                    if isinstance(response, dict) and response["type"] == "logout":
+                    elif isinstance(response, dict) and response["type"] == "logout":
                         try:
                             save_player(player['id'], player)
                             del connected_clients[player['id']]
@@ -124,10 +127,11 @@ async def websocket_endpoint(websocket: WebSocket):
                             })
                     
                     # Normal message handling
-                    await websocket.send_json({
-                        "type": "game_message",
-                        "message": response
-                    })
+                    else:
+                        await websocket.send_json({
+                            "type": "game_message",
+                            "message": response
+                        })
                 except Exception as e:
                     await websocket.send_json({
                         "type": "error",

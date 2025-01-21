@@ -8,7 +8,9 @@ class ActionHandler:
         }
 
     def handle(self, player, action, room):
-        if action == "logout":
+        if action.startswith("highcontrast "):
+            return self._handle_highcontrast(action)
+        elif action == "logout":
             return self._handle_logout(player)
         elif action in self.direction_mapping:
             action = f"go {self.direction_mapping[action]}"
@@ -93,3 +95,15 @@ class ActionHandler:
                 "type": "error",
                 "message": "Error during logout. Please try again."
             }
+
+    def _handle_highcontrast(self, action):
+        """Handle high contrast theme toggle."""
+        setting = action.split(" ")[1].lower()
+        if setting not in ["on", "off"]:
+            return "Usage: highcontrast on|off"
+            
+        return {
+            "type": "theme",
+            "theme": "high-contrast" if setting == "on" else "default",
+            "message": f"High contrast mode turned {setting}."
+        }
