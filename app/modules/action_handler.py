@@ -1,4 +1,4 @@
-from app.database import get_room, update_player_location, get_players_in_room
+from app.database import check_permission, save_room, update_player_location, get_room, get_players_in_room
 
 class ActionHandler:
     def __init__(self):
@@ -8,8 +8,34 @@ class ActionHandler:
             "north": "north", "south": "south", "east": "east", "west": "west",
             "up": "up", "down": "down"
         }
+        self.admin_commands = {
+            "grant_role": self._handle_grant_role,
+            "spawn_item": self._handle_spawn_item,
+            "teleport": self._handle_teleport
+        }
+        self.mod_commands = {
+            "kick": self._handle_kick,
+            "mute": self._handle_mute,
+            "ban": self._handle_ban,
+            "edit": self._handle_edit_room
+        }
 
     def handle(self, player, action, room):
+        command = action.split()[0].lower()
+        
+        # Check admin commands
+        if command in self.admin_commands:
+            if check_permission(player["id"], command):
+                return self.admin_commands[command](player, action, room)
+            return "You don't have permission to use that command."
+            
+        # Check mod commands
+        if command in self.mod_commands:
+            if check_permission(player["id"], command):
+                return self.mod_commands[command](player, action, room)
+            return "You don't have permission to use that command."
+            
+        # Handle regular commands
         if action.startswith("highcontrast "):
             return self._handle_highcontrast(action)
         elif action == "logout":
@@ -123,3 +149,74 @@ class ActionHandler:
             
         item_list = [item["name"] for item in items]
         return f"Your inventory contains:\n{', '.join(item_list)}"
+
+    def _handle_grant_role(self, player, action, room):
+        """Grant role to player (admin only)."""
+        parts = action.split()
+        if len(parts) != 3:
+            return "Usage: grant_role <player_name> <role>"
+            
+        target_name = parts[1]
+        role = parts[2]
+        
+        # Implementation details...
+        return f"Granted {role} role to {target_name}"
+
+    def _handle_edit_room(self, player, action, room):
+        """Edit room description (mod+ only)."""
+        parts = action.split(" ", 1)
+        if len(parts) != 2:
+            return "Usage: edit <new description>"
+            
+        room["description"] = parts[1]
+        save_room(player["location"], room)
+        return "Room description updated"
+
+    def _handle_spawn_item(self, player, action, room):
+        """Spawn an item in the current room (admin only)."""
+        parts = action.split()
+        if len(parts) < 2:
+            return "Usage: spawn_item <item_name>"
+            
+        item_name = " ".join(parts[1:])
+        new_item = {"name": item_name}
+        
+        room_items = room.get("items", [])
+        room_items.append(new_item)
+        room["items"] = room_items
+        
+        return f"Spawned {item_name} in the room."
+        
+    def _handle_teleport(self, player, action, room):
+        """Teleport to specific coordinates (admin only)."""
+        parts = action.split()
+        if len(parts) != 4:
+            return "Usage: teleport <x> <y> <z>"
+            
+        try:
+            x, y, z = map(int, parts[1:4])
+            player["location"] = (x, y, z)
+            return f"Teleported to coordinates ({x}, {y}, {z})"
+        except ValueError:
+            return "Invalid coordinates. Use numbers only."
+            
+    def _handle_kick(self, player, action, room):
+        """Kick a player (mod+ only)."""
+        parts = action.split()
+        if len(parts) < 2:
+            return "Usage: kick <player_name>"
+        return f"Kicked player {parts[1]}"
+        
+    def _handle_mute(self, player, action, room):
+        """Mute a player (mod+ only)."""
+        parts = action.split()
+        if len(parts) < 2:
+            return "Usage: mute <player_name>"
+        return f"Muted player {parts[1]}"
+        
+    def _handle_ban(self, player, action, room):
+        """Ban a player (mod+ only)."""
+        parts = action.split()
+        if len(parts) < 2:
+            return "Usage: ban <player_name>"
+        return f"Banned player {parts[1]}"

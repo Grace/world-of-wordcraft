@@ -194,3 +194,66 @@ def verify_player(name, password_hash):
         return result[0], None 
     finally:
         conn.close()
+
+def get_player_role(player_id):
+    """Get player's role and permissions."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("""
+            SELECT r.id, r.permissions
+            FROM players p
+            JOIN roles r ON p.role_id = r.id
+            WHERE p.id = ?
+        """, (player_id,))
+        result = cursor.fetchone()
+        if result:
+            return {
+                "role": result[0],
+                "permissions": json.loads(result[1])
+            }
+        return None
+    finally:
+        conn.close()
+
+def check_permission(player_id, permission):
+    """Check if player has permission."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("""
+            SELECT r.permissions
+            FROM players p
+            JOIN roles r ON p.role_id = r.id
+            WHERE p.id = ?
+        """, (player_id,))
+        result = cursor.fetchone()
+        
+        if result:
+            permissions = json.loads(result[0])
+            print(f"Debug - Player: {player_id}, Command: {permission}, Permissions: {permissions}")  # Debug line
+            return permission in permissions
+        return False
+    finally:
+        conn.close()
+
+def grant_role(player_id, role_id, granter_id):
+    """Grant role to player (requires admin)."""
+    if not check_permission(granter_id, "grant_role"):
+        return False, "Insufficient permissions"
+        
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("""
+            UPDATE players 
+            SET role_id = ?
+            WHERE id = ?
+        """, (role_id, player_id))
+        conn.commit()
+        return True, "Role granted successfully"
+    finally:
+        conn.close()

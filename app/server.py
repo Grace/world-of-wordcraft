@@ -63,6 +63,12 @@ ALLOWED_COMMANDS = {
     "interact", "use", "solve", "register", "login", "l", "i"
 }
 
+# Add to ALLOWED_COMMANDS
+ALLOWED_COMMANDS.update({
+    "grant_role", "kick", "mute", "ban", "edit",
+    "spawn_item", "teleport"
+})
+
 # Rate limiting storage
 rate_limits: Dict[str, list] = defaultdict(list)
 
@@ -187,7 +193,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         # Only send one success message
                         await websocket.send_json({
                             "type": "auth_success",
-                            "message": "Account created successfully. Welcome to World of Wordcraft!"
+                            "message": "Account created successfully. Welcome to World of Wordcraft!\n\nType 'look' to see where you are."
                         })
                     else:
                         await websocket.send_json({
@@ -201,7 +207,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         player = load_player(player_id)
                         await websocket.send_json({
                             "type": "auth_success",
-                            "message": f"Welcome back, {player['name_original']}! Type 'look' to see where you are."
+                            "message": f"Welcome back, {player['name_original']}!\n\nType 'look' to see where you are."
                         })
                     else:
                         await websocket.send_json({
