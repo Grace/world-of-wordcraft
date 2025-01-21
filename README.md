@@ -14,7 +14,7 @@ Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! T
 - **Dynamic Room Generation**: Immersive environments crafted with OpenAI, with an evolving game engine to add structure to the creative chaos of AI-generated content.  
 - **Hierarchical Role System**: Player roles include regular players, moderators, and admins, each with distinct permissions.  
 - **Real-Time Player Chat**: Engage with other players using a robust in-game chat system.  
-- **Interactive NPCs**: Encounter non-player characters with dialogue options and tradeable items to enhance gameplay.  
+- **Interactive NPCs**: Encounter non-player characters with dialogue options and tradeable items to enhance gameplay.
 - **Inventory and Trading**: Manage your items and trade seamlessly with other players.  
 
 ## Deployment
