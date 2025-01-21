@@ -84,6 +84,11 @@ ALLOWED_COMMANDS.update({
     "say", "yell", "tell"
 })
 
+# Add to ALLOWED_COMMANDS
+ALLOWED_COMMANDS.update({
+    "inspect"
+})
+
 # Rate limiting storage
 rate_limits: Dict[str, list] = defaultdict(list)
 

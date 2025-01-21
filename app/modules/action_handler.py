@@ -70,6 +70,8 @@ class ActionHandler:
             return self._handle_take(player, action, room)
         elif action.startswith(("interact ", "use ", "solve ")):
             return self._handle_interaction(player, action, room)
+        elif action.startswith("inspect "):
+            return self._handle_inspect(player, action)
         
         return "Invalid command."
 
@@ -329,3 +331,19 @@ class ActionHandler:
                 return response
                 
         return f"Player {parts[1]} not found or not online."
+
+    def _handle_inspect(self, player, action):
+        """Inspect an item in player's inventory."""
+        parts = action.split(" ", 1)
+        if len(parts) < 2:
+            return "Usage: inspect <item_name>"
+            
+        item_name = parts[1].lower()
+        inventory = player.get("inventory", [])
+        
+        for item in inventory:
+            if item["name"].lower() == item_name:
+                description = item.get("description", "A nondescript item.")
+                return f"{item['name']}: {description}"
+                
+        return f"You don't have a {item_name} in your inventory."
