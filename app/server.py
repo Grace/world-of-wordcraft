@@ -2,8 +2,9 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pathlib import Path
-from app.database import init_db, load_player, save_player, update_player_location, get_players_in_room
-from app.game_logic import handle_action, get_players_in_room
+from app.database import init_db, load_player, save_player, update_player_location, get_players_in_room, create_player, verify_player
+from app.game_logic import game_logic 
+import hashlib
 
 # Base directory for static files
 WEB_DIR = Path(__file__).parent.parent / "web"
@@ -40,68 +41,63 @@ connected_clients = {}
 
 @fastapi_app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    """Handle WebSocket connections for gameplay."""
     await websocket.accept()
-    origin = websocket.headers.get("origin", "Unknown")
-    print(f"WebSocket connection attempted from origin: {origin}")
-
-    player_id = websocket.client.host
-    player_room = None  # Track the player's current room
-
+    player = None
     try:
-        # Request player name
-        await websocket.send_json({"message": "Enter your name:"})
-        player_name = await websocket.receive_text()
-        print(f"Player name received: {player_name}")
+        # Auth request
+        await websocket.send_json({
+            "type": "auth_request",
+            "message": "Enter 'login <name> <password>' or 'register <name> <password>'"
+        })
 
-        # Create or load player data
-        player = load_player(player_id) or {
-            "id": player_id,
-            "name": player_name,
-            "location": (0, 0, 0),
-            "inventory": [],
-        }
-        save_player(player_id, player)
+        # Handle login/register
+        auth_message = await websocket.receive_text()
+        parts = auth_message.split()
+        
+        if len(parts) < 3:
+            await websocket.send_json({
+                "type": "error",
+                "message": "Invalid format. Use: login/register <name> <password>"
+            })
+            return
 
-        # Add WebSocket to connected clients
-        connected_clients[player_id] = websocket
-        player_room = player["location"]
+        command, name, password = parts[0], parts[1], parts[2]
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        
+        if command == "register":
+            player_id, message = create_player(name, password_hash)
+            if player_id:
+                player = load_player(player_id)
+        elif command == "login":
+            player_id, message = verify_player(name, password_hash)
+            if player_id:
+                player = load_player(player_id)
+        
+        if not player:
+            await websocket.send_json({"type": "error", "message": "Authentication failed"})
+            return
 
-        # Welcome the player
-        await websocket.send_json({"message": f"Welcome {player_name}! Type 'look' to start."})
-
-        # Main gameplay loop
+        # Game loop
         while True:
             command = await websocket.receive_text()
-            print(f"Command received: {command}")
             if command:
-                response = handle_action(player, command)
-                # Ensure response is a string
-                message = response if isinstance(response, str) else str(response)
-                await websocket.send_json({
-                    "type": "game_message",
-                    "message": message
-                })
+                try:
+                    response = game_logic.handle_action(player, command)
+                    await websocket.send_json({
+                        "type": "game_message",
+                        "message": response
+                    })
+                except Exception as e:
+                    await websocket.send_json({
+                        "type": "error",
+                        "message": str(e)
+                    })
 
     except WebSocketDisconnect:
-        print(f"WebSocket disconnected: {player_id}")
-    except Exception as e:
-        print(f"WebSocket error: {e}")
-
+        print(f"Client {player['id'] if player else 'unknown'} disconnected")
     finally:
-        # Clean up on disconnect
-        if player_id in connected_clients:
-            del connected_clients[player_id]
-            print(f"Client {player_id} disconnected.")
-        
-        # Remove player from their room
-        if player_room:
-            players_in_room = get_players_in_room(player_room)
-            if player_id in players_in_room:
-                players_in_room.remove(player_id)
-                update_player_location(player_room, players_in_room)
-
-        print("WebSocket connection closed.")
+        if player:
+            save_player(player['id'], player)
 
 if __name__ == "__main__":
     import uvicorn

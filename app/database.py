@@ -5,36 +5,13 @@ import json
 DB_FILE = "game.db"
 
 def init_db():
-    """Initialize the database and create tables if they do not exist."""
-    if not os.path.exists(DB_FILE):
-        print("Database file not found. Creating a new one...")
+    """Initialize database schema"""
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-
-    # Create players table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS players (
-        id TEXT PRIMARY KEY,
-        name TEXT,
-        location_x INTEGER,
-        location_y INTEGER,
-        location_z INTEGER,
-        inventory TEXT
-    )
-    """)
-
-    # Create rooms table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS rooms (
-        coordinates TEXT PRIMARY KEY,
-        description TEXT,
-        exits TEXT,
-        puzzle TEXT,
-        npc TEXT,
-        items TEXT
-    )
-    """)
-
+    
+    with open('app/schema.sql') as f:
+        cursor.executescript(f.read())
+    
     conn.commit()
     conn.close()
 
@@ -44,35 +21,38 @@ def get_connection():
 
 def save_room(coordinates, room_data):
     """Save a room to the database."""
-    conn = sqlite3.connect(DB_FILE)
+    conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("""
-        INSERT OR REPLACE INTO rooms (coordinates, description, exits, puzzle, npc, items)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, (
-        json.dumps(coordinates),
-        room_data["description"],
-        json.dumps(room_data["exits"]),
-        room_data.get("puzzle"),
-        json.dumps(room_data.get("npc", [])),
-        json.dumps(room_data.get("items", []))
-    ))
-    conn.commit()
-    conn.close()
+    
+    try:
+        cursor.execute("""
+            INSERT OR REPLACE INTO rooms (coordinates, description, exits, npcs, items, puzzles)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            json.dumps(coordinates),
+            room_data["description"],
+            json.dumps(room_data["exits"]),
+            json.dumps(room_data.get("npcs", [])),
+            json.dumps(room_data.get("items", [])),
+            json.dumps(room_data.get("puzzles", []))
+        ))
+        conn.commit()
+    finally:
+        conn.close()
 
 def get_room(coordinates):
     """Retrieve a room from the database by its coordinates."""
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    cursor.execute("SELECT description, exits, puzzle, npc, items FROM rooms WHERE coordinates = ?", (json.dumps(coordinates),))
+    cursor.execute("SELECT description, exits, puzzles, npcs, items FROM rooms WHERE coordinates = ?", (json.dumps(coordinates),))
     result = cursor.fetchone()
     conn.close()
     if result:
         return {
             "description": result[0],
             "exits": json.loads(result[1]),
-            "puzzle": result[2],
-            "npc": json.loads(result[3]),
+            "puzzles": result[2],
+            "npcs": json.loads(result[3]),
             "items": json.loads(result[4]),
         }
     return None
@@ -126,17 +106,20 @@ def get_players_in_room(location, exclude=None):
     Returns:
         list: A list of player names in the room.
     """
-    conn = sqlite3.connect(DB_FILE)
+    conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("""
-        SELECT name
-        FROM players
-        WHERE location_x = ? AND location_y = ? AND location_z = ?
-    """, location)
-    players = cursor.fetchall()
-    conn.close()
-
-    return [player[0] for player in players if player[0] != exclude]
+    
+    try:
+        x, y, z = location
+        cursor.execute("""
+            SELECT name FROM players 
+            WHERE location_x = ? AND location_y = ? AND location_z = ? 
+            AND id != ?
+        """, (x, y, z, exclude))
+        
+        return [row[0] for row in cursor.fetchall()]
+    finally:
+        conn.close()
 
 def update_player_location(player_id, location):
     """
@@ -146,12 +129,58 @@ def update_player_location(player_id, location):
         player_id (str): The unique ID of the player.
         location (tuple): The new (x, y, z) coordinates of the player.
     """
-    conn = sqlite3.connect(DB_FILE)
+    conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("""
-        UPDATE players
-        SET location_x = ?, location_y = ?, location_z = ?
-        WHERE id = ?
-    """, (*location, player_id))
-    conn.commit()
-    conn.close()
+    
+    try:
+        x, y, z = location
+        cursor.execute("""
+            UPDATE players 
+            SET location_x = ?, location_y = ?, location_z = ?
+            WHERE id = ?
+        """, (x, y, z, player_id))
+        conn.commit()
+    finally:
+        conn.close()
+
+def create_player(name, password_hash):
+    """Create a new player account."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Check if player exists
+        cursor.execute("SELECT id FROM players WHERE name = ?", (name,))
+        if cursor.fetchone():
+            return None, "Player name already exists"
+            
+        player_id = f"player_{name.lower()}"
+        cursor.execute("""
+            INSERT INTO players (id, name, password_hash, location_x, location_y, location_z, inventory)
+            VALUES (?, ?, ?, 0, 0, 0, '[]')
+        """, (player_id, name, password_hash))
+        
+        conn.commit()
+        return player_id, "Account created successfully"
+    finally:
+        conn.close()
+
+def verify_player(name, password_hash):
+    """Verify player credentials."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("""
+            SELECT id, password_hash FROM players 
+            WHERE name = ?
+        """, (name,))
+        result = cursor.fetchone()
+        
+        if not result:
+            return None, "Player not found"
+        if result[1] != password_hash:
+            return None, "Invalid password"
+        return result[0], "Login successful"
+    finally:
+        conn.close()

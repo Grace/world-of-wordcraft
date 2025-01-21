@@ -34,19 +34,12 @@ ws.onmessage = (event) => {
     try {
         const data = JSON.parse(event.data);
         
-        if (data.type === "error") {
-            console.error(data.message);
+        if (data.type === "auth_request" || data.type === "auth_success") {
+            appendToOutput(data.message);
+        } else if (data.type === "error") {
             appendToOutput(`Error: ${data.message}`);
         } else if (data.type === "game_message") {
-            // Format the message content
-            const message = typeof data.message === 'object' ? 
-                JSON.stringify(data.message, null, 2) : 
-                data.message.toString();
-            
-            appendToOutput(message);
-        } else {
-            console.warn("Unknown message type:", data.type);
-            appendToOutput("Received unknown message type from server");
+            appendToOutput(data.message);
         }
     } catch (error) {
         console.error("Failed to parse message:", error);
