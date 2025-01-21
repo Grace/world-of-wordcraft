@@ -95,7 +95,7 @@ ALLOWED_COMMANDS.update({
 })
 
 # Update help message
-REGISTER_OR_LOGIN_MESSAGE = """\nWelcome to World of Wordcraft!\n\nEnter 'login <name> <password>' or 'register <name> <password>'.
+REGISTER_OR_LOGIN_MESSAGE = """Welcome to World of Wordcraft!\n\nEnter 'login <name> <password>' or 'register <name> <password>'.
 
 Available accessibility commands:
 - highcontrast on/off
