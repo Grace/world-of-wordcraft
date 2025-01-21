@@ -1,5 +1,5 @@
 # World of Wordcraft
-A love letter to MUD games and early MMORPGs from the 80s and 90s, designed for accessibility. In-game worldbuilding generated with OpenAI.
+A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as MUDs) designed for accessibility. In-game worldbuilding generated with OpenAI.
 
 ## Game Demo
 Link to play the game in your browser: [https://world-of-wordcraft.up.railway.app/](https://world-of-wordcraft.up.railway.app/)
