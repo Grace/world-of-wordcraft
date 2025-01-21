@@ -1,11 +1,13 @@
 # World of Wordcraft
-A text-based MMORPG designed to be screen reader friendly.
+Proof of concept for an open-source, text-based MMORPG designed for screen readers. In-game worldbuilding generated with OpenAI.
 
-## Demo
-[https://world-of-wordcraft-production.up.railway.app/](https://world-of-wordcraft-production.up.railway.app/)
+## Game Demo
+Link to play the game in your browser: [https://world-of-wordcraft-production.up.railway.app/](https://world-of-wordcraft-production.up.railway.app/)
+
+If you get disconnected or run into an error, refresh the page and try again in a minute. The app goes to sleep based on traffic.
 
 ## Features
-- Screen-reader-friendly gameplay.
+- Screen-reader friendly gameplay (work in progress, need feedback from daily screen reader users).
 - Dynamic room generation with OpenAI.
 - NPCs with dialogues and items.
 - Player inventory and trading system.
@@ -17,5 +19,8 @@ A text-based MMORPG designed to be screen reader friendly.
 
 ## Local Development
 1. Install dependencies: `pip install -r requirements.txt`.
-2. Run the server: `python app/server.py`.
-3. Connect to `ws://localhost:8765` using a WebSocket client or point your browser to `localhost:5001`.
+2. Run the server: `python -m app.server.py`.
+3. Connect to `ws://localhost:5001` using a WebSocket client like `wscat` or point your browser to `localhost:5001`.
+
+## Extra Goals
+- [ ] Make room generation be based on exits described in previously generated, connected rooms
