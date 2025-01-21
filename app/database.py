@@ -41,21 +41,30 @@ def save_room(coordinates, room_data):
         conn.close()
 
 def get_room(coordinates):
-    """Retrieve a room from the database by its coordinates."""
-    conn = sqlite3.connect(DB_FILE)
+    """Get room data with proper JSON parsing."""
+    conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT description, exits, puzzles, npcs, items FROM rooms WHERE coordinates = ?", (json.dumps(coordinates),))
-    result = cursor.fetchone()
-    conn.close()
-    if result:
-        return {
-            "description": result[0],
-            "exits": json.loads(result[1]),
-            "puzzles": result[2],
-            "npcs": json.loads(result[3]),
-            "items": json.loads(result[4]),
-        }
-    return None
+    
+    try:
+        cursor.execute("""
+            SELECT description, exits, npcs, items, puzzles 
+            FROM rooms 
+            WHERE coordinates = ?
+        """, (f"{coordinates[0]},{coordinates[1]},{coordinates[2]}",))
+        
+        result = cursor.fetchone()
+        if result:
+            description, exits, npcs, items, puzzles = result
+            return {
+                "description": description,
+                "exits": json.loads(exits),
+                "npcs": json.loads(npcs),
+                "items": json.loads(items),
+                "puzzles": json.loads(puzzles)
+            }
+        return None
+    finally:
+        conn.close()
 
 def save_player(player_id, player_data):
     """Save player state to database."""

@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS roles (
 -- Insert default roles
 INSERT OR IGNORE INTO roles (id, name, permissions) VALUES
     ('player', 'Player', '["look", "go", "take", "inventory", "logout", "highcontrast", "fontsize", "interact", "use", "solve"]'),
-    ('moderator', 'Moderator', '["look", "go", "take", "inventory", "logout", "highcontrast", "fontsize", "interact", "use", "solve", "kick", "mute", "ban", "edit_room"]'),
-    ('admin', 'Admin', '["look", "go", "take", "inventory", "logout", "highcontrast", "fontsize", "interact", "use", "solve", "kick", "mute", "ban", "edit_room", "grant_role", "spawn_item", "teleport"]');
+    ('moderator', 'Moderator', '["look", "go", "take", "inventory", "logout", "highcontrast", "fontsize", "interact", "use", "solve", "kick", "mute", "ban", "edit_room_description"]'),
+    ('admin', 'Admin', '["look", "go", "take", "inventory", "logout", "highcontrast", "fontsize", "interact", "use", "solve", "kick", "mute", "ban", "edit_room_description", "grant_role", "spawn_item", "teleport"]');
 
 -- Add banned players table
 CREATE TABLE IF NOT EXISTS banned_players (

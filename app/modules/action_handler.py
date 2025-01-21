@@ -26,7 +26,7 @@ class ActionHandler:
             "kick": self._handle_kick,
             "mute": self._handle_mute,
             "ban": self._handle_ban,
-            "edit": self._handle_edit_room
+            "edit_room_description": self._handle_edit_room_description
         }
 
     def handle(self, player, action, room):
@@ -116,22 +116,28 @@ class ActionHandler:
         return f"There is no {item_name} here."
 
     def _handle_interaction(self, player, action, room):
-        parts = action.split(" ", 2)
+        """Handle puzzle interactions and solutions."""
+        parts = action.split(" ", 1)  # Split into command and answer
+        if len(parts) < 2:
+            return "Usage: solve <answer>"
+            
         command = parts[0]
-        target = parts[-1].lower()
+        answer = parts[1].lower()
 
-        puzzles = room.get("puzzles")
-        if len(puzzles)==0:
+        puzzles = room.get("puzzles", [])
+        if not puzzles:
             return "There's nothing to interact with here."
-        else:
-            for puzzle in puzzles:
-                if command == "solve" and puzzle["type"] == "riddle":
-                    if target == puzzle["solution"].lower():
-                        room["puzzle"] = None
-                        return "You solved the riddle!"
-                    return "That's not the correct answer."
+            
+        for puzzle in puzzles:
+            if isinstance(puzzle, dict) and puzzle.get("type") == "riddle":
+                if answer == str(puzzle.get("solution", "")).lower():
+                    puzzles.remove(puzzle)
+                    room["puzzles"] = puzzles
+                    save_room(player["location"], room)
+                    return "You solved the riddle!"
+                return "That's not the correct answer."
 
-        return f"You try to {command} {target} but nothing happens."
+        return "There are no puzzles to solve here."
 
     def _handle_logout(self, player):
         """Handle player logout."""
@@ -180,11 +186,11 @@ class ActionHandler:
         # Implementation details...
         return f"Granted {role} role to {target_name}"
 
-    def _handle_edit_room(self, player, action, room):
+    def _handle_edit_room_description(self, player, action, room):
         """Edit room description (mod+ only)."""
         parts = action.split(" ", 1)
         if len(parts) != 2:
-            return "Usage: edit <new description>"
+            return "Usage: edit_room_description <new description>"
             
         room["description"] = parts[1]
         save_room(player["location"], room)

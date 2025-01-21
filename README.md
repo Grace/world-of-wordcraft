@@ -33,8 +33,9 @@ A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as M
 - [ ] Add fishing system
 - [ ] Add player trading system
 - [ ] Add in-game currency and item shops
-- [ ] Add level/experience system
-- [ ] Add player classes
+- [ ] Implement functional puzzles
+- [ ] Add weather system
+- [ ] Implement crafting
 - [ ] Add support for PostgreSQL instead of or in addition to SQLite
 - [ ] Setup unit and/or integration tests
 - [ ] Setup development build/deployment
