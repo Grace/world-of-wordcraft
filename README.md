@@ -2,7 +2,7 @@
 Proof of concept for an open-source, text-based MMORPG designed for screen readers. In-game worldbuilding generated with OpenAI.
 
 ## Game Demo
-Link to play the game in your browser: [https://world-of-wordcraft-production.up.railway.app/](https://world-of-wordcraft-production.up.railway.app/)
+Link to play the game in your browser: [https://world-of-wordcraft.up.railway.app/](https://world-of-wordcraft.up.railway.app/)
 
 If you get disconnected or run into an error, refresh the page and try again in a minute. The app goes to sleep based on traffic.
 
