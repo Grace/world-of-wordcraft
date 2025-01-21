@@ -58,22 +58,32 @@ def get_room(coordinates):
     return None
 
 def save_player(player_id, player_data):
-    """Save a player's data to the database."""
-    conn = sqlite3.connect(DB_FILE)
+    """Save player state to database."""
+    conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("""
-        INSERT OR REPLACE INTO players (id, name, location_x, location_y, location_z, inventory)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, (
-        player_id,
-        player_data["name"],
-        player_data["location"][0],
-        player_data["location"][1],
-        player_data["location"][2],
-        json.dumps(player_data.get("inventory", []))
-    ))
-    conn.commit()
-    conn.close()
+    
+    try:
+        cursor.execute("""
+            UPDATE players 
+            SET name = ?,
+                name_original = ?,
+                location_x = ?,
+                location_y = ?,
+                location_z = ?,
+                inventory = ?
+            WHERE id = ?
+        """, (
+            player_data["name"].lower(),
+            player_data["name_original"],
+            player_data["location"][0],
+            player_data["location"][1],
+            player_data["location"][2],
+            json.dumps(player_data.get("inventory", [])),
+            player_id
+        ))
+        conn.commit()
+    finally:
+        conn.close()
 
 def load_player(player_id):
     conn = get_connection()

@@ -105,6 +105,25 @@ async def websocket_endpoint(websocket: WebSocket):
             if command:
                 try:
                     response = game_logic.handle_action(player, command)
+                    
+                    # Handle logout command
+                    if isinstance(response, dict) and response["type"] == "logout":
+                        try:
+                            save_player(player['id'], player)
+                            del connected_clients[player['id']]
+                            await websocket.send_json({
+                                "type": "game_message",
+                                "message": response["message"]
+                            })
+                            await websocket.close()
+                            return
+                        except Exception as e:
+                            await websocket.send_json({
+                                "type": "error",
+                                "message": "Error during logout. Please try again."
+                            })
+                    
+                    # Normal message handling
                     await websocket.send_json({
                         "type": "game_message",
                         "message": response

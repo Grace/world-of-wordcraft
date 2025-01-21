@@ -8,7 +8,9 @@ class ActionHandler:
         }
 
     def handle(self, player, action, room):
-        if action in self.direction_mapping:
+        if action == "logout":
+            return self._handle_logout(player)
+        elif action in self.direction_mapping:
             action = f"go {self.direction_mapping[action]}"
 
         if action.startswith("go "):
@@ -78,3 +80,16 @@ class ActionHandler:
                     return "That's not the correct answer."
 
         return f"You try to {command} {target} but nothing happens."
+
+    def _handle_logout(self, player):
+        """Handle player logout."""
+        try:
+            return {
+                "type": "logout", 
+                "message": f"Goodbye, {player['name_original']}! Come back soon."
+            }
+        except KeyError:
+            return {
+                "type": "error",
+                "message": "Error during logout. Please try again."
+            }
