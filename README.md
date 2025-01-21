@@ -11,8 +11,8 @@ A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as M
 ## Features
 - Screen-reader friendly gameplay (work in progress), currently has a built-in "speech" command for accessibility.
 - Dynamic room generation with OpenAI.
-- Player roles with escalating priviledges (player, moderator, admin)
-- In-game player chat system
+- Player roles with escalating priviledges (player, moderator, admin).
+- In-game player chat system.
 - NPCs with dialogues and items.
 - Player inventory and trading system.
 
