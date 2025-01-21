@@ -9,12 +9,12 @@ If you get disconnected or run into an error, refresh the page and try again in 
 A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as MUDs) designed for accessibility. In-game worldbuilding generated with OpenAI.
 
 ## Features  
-- **Text-to-speech Gameplay**: Currently in development, featuring a built-in `speech on` command for speech-to-text functionality and a `speech repeat` command to replay visible game updates for the player.  
-- **Dynamic Room Generation**: Leveraging OpenAI to create immersive environments, with efforts underway to build a game engine that adds structure to the creative chaos of AI-generated prompts.  
-- **Player Roles and Privileges**: A hierarchical role system, including players, moderators, and admins, with escalating permissions.  
-- **In-Game Player Chat**: A robust chat system for real-time interaction between players.  
-- **Interactive NPCs**: Non-player characters equipped with dialogue options and tradeable items to enrich the gameplay experience.  
-- **Player Inventory and Trading**: Manage inventory and trade items seamlessly within the game.  
+- **Text-to-Speech Accessibility**: Activate with the `speech on` command to narrate game events, offering a hands-free, immersive experience. Replay recent updates with the `speech repeat` command.  
+- **Dynamic Room Generation**: Immersive environments crafted with OpenAI, with an evolving game engine to add structure to the creative chaos of AI-generated content.  
+- **Hierarchical Role System**: Player roles include regular players, moderators, and admins, each with distinct permissions.  
+- **Real-Time Player Chat**: Engage with other players using a robust in-game chat system.  
+- **Interactive NPCs**: Encounter non-player characters with dialogue options and tradeable items to enhance gameplay.  
+- **Inventory and Trading**: Manage your items and trade seamlessly with other players.  
 
 ## Deployment
 1. Clone the repository.
@@ -28,21 +28,21 @@ A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as M
 3. Connect to `ws://localhost:5001` using a WebSocket client like `wscat` or point your browser to `localhost:5001`.
 
 ## Extra Goals
-- [ ] Create game engine to make everything else on this to-do list more managable
-- [ ] Make room generation be based on exits described in previously generated, connected rooms
-- [ ] Implement help command for more information about other commands
-- [x] Add roles such as moderator and admin with varying priviledges
-- [ ] Make rooms, NPCs, items, and interactions editable by moderators and/or admins
-- [x] Add player chat system (say, yell, tell)
-- [ ] Add fishing system
-- [ ] Add player trading system
-- [ ] Add in-game currency and item shops
-- [ ] Implement functional puzzles
-- [ ] Add weather system
-- [ ] Implement crafting
-- [ ] Add support for PostgreSQL instead of or in addition to SQLite
-- [ ] Setup unit and/or integration tests
-- [ ] Setup development build/deployment
+- [ ] **Build a Core Game Engine**: Develop a robust game engine to streamline the implementation of all other features and improve maintainability.  
+- [ ] **Enhanced Room Generation**: Ensure room generation dynamically accounts for exits in connected rooms, creating a more cohesive world.  
+- [ ] **Help Command**: Add a `help` command to provide detailed guidance on all available commands.  
+- [x] **Roles and Privileges**: Implement hierarchical roles such as moderators and admins, each with varying levels of permissions.  
+- [ ] **Editable World Elements**: Allow moderators and admins to modify rooms, NPCs, items, and interactions in-game.  
+- [x] **Player Chat System**: Introduce versatile player communication commands (`say`, `yell`, `tell`) for real-time interaction.  
+- [ ] **Fishing System**: Add a fishing mechanic for players, expanding gameplay variety.  
+- [ ] **Player Trading System**: Allow players to trade items seamlessly in-game.  
+- [ ] **In-Game Currency and Shops**: Introduce a currency system and item shops for economic gameplay elements.  
+- [ ] **Functional Puzzles**: Incorporate puzzles that players can solve for rewards or story progression.  
+- [ ] **Weather System**: Implement a dynamic weather system to add environmental variety and immersion.  
+- [ ] **Crafting Mechanics**: Introduce crafting features for players to create items from materials.  
+- [ ] **Scalable Database Support**: Add support for scalable SQL and/or NoSQL database(s)
+- [ ] **Unit and Integration Testing**: Set up comprehensive unit and integration tests to ensure stability and reliability.  
+- [ ] **Development Build/Deployment**: Establish a robust build and deployment pipeline to streamline development and testing.  
 
 ## Disclaimer
-This project is entirely unrelated to any commercial MMORPGs, despite its name being a playful pun. It is an open-source initiative focused on exploring the effective use of AI for generating textual game content. Any resemblance between the generated content and existing copyrighted material is purely coincidental.
+This project is entirely unrelated to any commercial MMORPGs, despite its name being a playful pun. It is an open-source project focused on exploring the effective use of AI for generating textual game content. Any resemblance between the generated content and existing copyrighted material is coincidental.
