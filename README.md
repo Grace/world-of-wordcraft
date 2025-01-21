@@ -29,3 +29,8 @@ A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as M
 - [ ] Add roles such as moderator and admin
 - [ ] Make rooms, NPCs, items, and interactions editable by moderators and/or admins
 - [ ] Add player chat system (say, yell, whisper)
+- [ ] Add fishing system
+- [ ] Add player trading system
+- [ ] Add in-game currency and item shops
+- [ ] Add level/experience system
+- [ ] Add player classes
