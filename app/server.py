@@ -95,7 +95,7 @@ ALLOWED_COMMANDS.update({
 })
 
 # Update help message
-HELP_MESSAGE = """Enter 'login <name> <password>' or 'register <name> <password>'.
+REGISTER_OR_LOGIN_MESSAGE = """\nWelcome to World of Wordcraft!\n\nEnter 'login <name> <password>' or 'register <name> <password>'.
 
 Available accessibility commands:
 - highcontrast on/off
@@ -153,7 +153,7 @@ async def websocket_endpoint(websocket: WebSocket):
         # Initial auth request
         await websocket.send_json({
             "type": "auth_request",
-            "message": "Enter 'login <name> <password>' or 'register <name> <password>'.\n\nAvailable accessibility commands:\n- highcontrast on/off\n- fontsize <number>"
+            "message": REGISTER_OR_LOGIN_MESSAGE
         })
         
         while True:
