@@ -1,5 +1,5 @@
 # World of Wordcraft
-Proof of concept for an open-source, text-based MMORPG designed for screen readers. In-game worldbuilding generated with OpenAI.
+A love letter to MUD games and early MMORPGs from the 80s and 90s, designed for accessibility. In-game worldbuilding generated with OpenAI.
 
 ## Game Demo
 Link to play the game in your browser: [https://world-of-wordcraft.up.railway.app/](https://world-of-wordcraft.up.railway.app/)
@@ -7,7 +7,7 @@ Link to play the game in your browser: [https://world-of-wordcraft.up.railway.ap
 If you get disconnected or run into an error, refresh the page and try again in a minute. The app goes to sleep based on traffic.
 
 ## Features
-- Screen-reader friendly gameplay (work in progress, need feedback from daily screen reader users).
+- Screen-reader friendly gameplay (work in progress).
 - Dynamic room generation with OpenAI.
 - NPCs with dialogues and items.
 - Player inventory and trading system.
