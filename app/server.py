@@ -79,6 +79,11 @@ ALLOWED_COMMANDS.update({
     "spawn_item", "teleport"
 })
 
+# Add to ALLOWED_COMMANDS
+ALLOWED_COMMANDS.update({
+    "say", "yell", "tell"
+})
+
 # Rate limiting storage
 rate_limits: Dict[str, list] = defaultdict(list)
 
@@ -286,6 +291,50 @@ async def websocket_endpoint(websocket: WebSocket):
                                     "type": "game_message",
                                     "message": response["admin_message"]
                                 })
+                                continue
+                            # Handle chat messages
+                            if isinstance(response, dict) and response["type"] == "chat":
+                                if response["chat_type"] == "say":
+                                    # Send to players in same room
+                                    for pid, ws in connected_clients.items():
+                                        target = load_player(pid)
+                                        if (target and 
+                                            target["location"] == player["location"] and 
+                                            pid != player["id"]):
+                                            await ws.send_json({
+                                                "type": "game_message",
+                                                "message": f"{response['sender']} says: {response['message']}"
+                                            })
+                                    await websocket.send_json({
+                                        "type": "game_message",
+                                        "message": f"You say: {response['message']}"
+                                    })
+                                    
+                                elif response["chat_type"] == "yell":
+                                    # Send to all players
+                                    for pid, ws in connected_clients.items():
+                                        if pid != player["id"]:
+                                            await ws.send_json({
+                                                "type": "game_message",
+                                                "message": f"{response['sender']} yells: {response['message']}"
+                                            })
+                                    await websocket.send_json({
+                                        "type": "game_message",
+                                        "message": f"You yell: {response['message']}"
+                                    })
+                                    
+                                elif response["chat_type"] == "tell":
+                                    # Send private message
+                                    target_ws = connected_clients.get(response["target_id"])
+                                    if target_ws:
+                                        await target_ws.send_json({
+                                            "type": "game_message",
+                                            "message": f"{response['sender']} tells you: {response['message']}"
+                                        })
+                                        await websocket.send_json({
+                                            "type": "game_message",
+                                            "message": f"You tell {response['target']}: {response['message']}"
+                                        })
                                 continue
                         
                         # Normal message handling

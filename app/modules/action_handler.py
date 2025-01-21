@@ -32,6 +32,14 @@ class ActionHandler:
     def handle(self, player, action, room):
         command = action.split()[0].lower()
         
+        # Add chat commands
+        if command == "say":
+            return self._handle_say(player, action, room)
+        elif command == "yell":
+            return self._handle_yell(player, action)
+        elif command == "tell":
+            return self._handle_tell(player, action)
+        
         # Check admin commands
         if command in self.admin_commands:
             if check_permission(player["id"], command):
@@ -259,4 +267,59 @@ class ActionHandler:
                     }
                 return "Failed to ban player"
                     
+        return f"Player {parts[1]} not found or not online."
+
+    def _handle_say(self, player, action, room):
+        """Send message to all players in the same room."""
+        parts = action.split(" ", 1)
+        if len(parts) < 2:
+            return "Usage: say <message>"
+            
+        message = parts[1]
+        response = {
+            "type": "chat",
+            "chat_type": "say",
+            "sender": player["name_original"],
+            "message": message,
+            "location": player["location"]
+        }
+        return response
+
+    def _handle_yell(self, player, action):
+        """Send message to all connected players."""
+        parts = action.split(" ", 1)
+        if len(parts) < 2:
+            return "Usage: yell <message>"
+            
+        message = parts[1]
+        response = {
+            "type": "chat",
+            "chat_type": "yell",
+            "sender": player["name_original"],
+            "message": message
+        }
+        return response
+
+    def _handle_tell(self, player, action):
+        """Send private message to another player."""
+        parts = action.split(" ", 2)
+        if len(parts) < 3:
+            return "Usage: tell <player_name> <message>"
+            
+        target_name = parts[1].lower()
+        message = parts[2]
+        
+        for player_id, websocket in self.connected_clients.items():
+            target = load_player(player_id)
+            if target and target["name"].lower() == target_name:
+                response = {
+                    "type": "chat",
+                    "chat_type": "tell",
+                    "sender": player["name_original"],
+                    "target": target["name_original"],
+                    "message": message,
+                    "target_id": player_id
+                }
+                return response
+                
         return f"Player {parts[1]} not found or not online."
