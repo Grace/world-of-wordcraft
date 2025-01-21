@@ -65,25 +65,26 @@ ws.onerror = (error) => {
 ws.onmessage = (event) => {
     try {
         const data = JSON.parse(event.data);
-        if (data.type === "game_message") {
-            appendToOutput(data.message);
-        }
-        if (data.type === "auth_request") {
-            appendToOutput(data.message);
-        } else if (data.type === "auth_success") {
-            appendToOutput(data.message);
-        } else if (data.type === "theme") {
-            document.documentElement.setAttribute('data-theme', data.theme);
-            localStorage.setItem('theme', data.theme);
-            appendToOutput(data.message);
-        } else if (data.type === "game_message") {
-            appendToOutput(data.message);
-        } else if (data.type === "error") {
-            appendToOutput(`Error: ${data.message}`);
-        } else if (data.type === "fontsize") {
-            output.style.fontSize = `${data.size}px`;
-            localStorage.setItem('fontSize', data.size);
-            appendToOutput(data.message);
+        
+        switch(data.type) {
+            case "auth_request":
+            case "auth_success":
+            case "game_message":
+                appendToOutput(data.message);
+                break;
+            case "theme":
+                document.documentElement.setAttribute('data-theme', data.theme);
+                localStorage.setItem('theme', data.theme);
+                appendToOutput(data.message);
+                break;
+            case "error":
+                appendToOutput(`Error: ${data.message}`);
+                break;
+            case "fontsize":
+                output.style.fontSize = `${data.size}px`;
+                localStorage.setItem('fontSize', data.size);
+                appendToOutput(data.message);
+                break;
         }
         
         // Observe the last message for visibility
