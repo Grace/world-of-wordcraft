@@ -9,7 +9,7 @@ If you get disconnected or run into an error, refresh the page and try again in 
 A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as MUDs) designed for accessibility. In-game worldbuilding generated with OpenAI.
 
 ## Features
-- Screen-reader friendly gameplay (work in progress), currently has a built-in "speech" command for accessibility.
+- Screen-reader friendly gameplay (work in progress), currently has a built-in "speech on" command to turn on speech-to-text and "speech repeat" to re-read visible game udpates to the player.
 - Dynamic room generation with OpenAI.
 - Player roles with escalating priviledges (player, moderator, admin).
 - In-game player chat system.
