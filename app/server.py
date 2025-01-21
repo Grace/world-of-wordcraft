@@ -45,66 +45,91 @@ async def websocket_endpoint(websocket: WebSocket):
     player = None
     
     try:
-        # Auth request
         await websocket.send_json({
             "type": "auth_request",
-            "message": "Enter 'login <name> <password>' or 'register <name> <password>'"
+            "message": "Enter 'login <name> <password>' or 'register <name> <password>'.\nAvailable commands:\n- highcontrast on/off\n- fontsize <number>"
         })
         
-        # Handle login/register
-        auth_message = await websocket.receive_text()
-        parts = auth_message.split()
-        
-        if len(parts) < 3:
-            await websocket.send_json({
-                "type": "error",
-                "message": "Invalid format. Use: login/register <name> <password>"
-            })
-            return
-
-        command, name, password = parts[0], parts[1], parts[2]
-        password_hash = hashlib.sha256(password.encode()).hexdigest()
-        
-        if command == "register":
-            player_id, message = create_player(name, password_hash)
-            await websocket.send_json({
-                "type": "auth_success" if player_id else "error",
-                "message": message
-            })
-            if player_id:
-                player = load_player(player_id)
-                # Send welcome message after successful registration
-                await websocket.send_json({
-                    "type": "game_message",
-                    "message": f"Welcome, {name}! You have joined World of Wordcraft. Type 'look' to begin your adventure."
-                })
-                
-        elif command == "login":
-            player_id, message = verify_player(name, password_hash)
-            await websocket.send_json({
-                "type": "auth_success" if player_id else "error",
-                "message": message
-            })
-            if player_id:
-                player = load_player(player_id)
-                # Send welcome message after successful login with proper name casing
-                await websocket.send_json({
-                    "type": "game_message",
-                    "message": f"Welcome back, {player['name_original']}! Type 'look' to see where you are."
-                })
-        
-        if not player:
-            return
-
-        # Add to connected clients
-        connected_clients[player_id] = websocket
-
-        # Game loop
         while True:
-            command = await websocket.receive_text()
-            if command:
+            message = await websocket.receive_text()
+            
+            # Handle pre-auth commands
+            if message.startswith("highcontrast "):
+                setting = message.split(" ")[1].lower()
+                if setting in ["on", "off"]:
+                    await websocket.send_json({
+                        "type": "theme",
+                        "theme": "high-contrast" if setting == "on" else "default",
+                        "message": f"High contrast mode turned {setting}."
+                    })
+                continue
+            elif message.startswith("fontsize "):
                 try:
-                    response = game_logic.handle_action(player, command)
+                    size = int(message.split(" ")[1])
+                    await websocket.send_json({
+                        "type": "fontsize",
+                        "size": size,
+                        "message": f"Font size set to {size}px."
+                    })
+                    continue
+                except (IndexError, ValueError):
+                    await websocket.send_json({
+                        "type": "error",
+                        "message": "Usage: fontsize <number>"
+                    })
+                    continue
+                
+            # Handle auth flow
+            if not player:
+                parts = message.split()
+                if len(parts) < 3:
+                    await websocket.send_json({
+                        "type": "error",
+                        "message": "Invalid format. Use: login/register <name> <password>"
+                    })
+                    continue
+
+                command, name, password = parts[0], parts[1], parts[2]
+                password_hash = hashlib.sha256(password.encode()).hexdigest()
+                
+                if command == "register":
+                    player_id, message = create_player(name, password_hash)
+                    await websocket.send_json({
+                        "type": "auth_success" if player_id else "error",
+                        "message": message
+                    })
+                    if player_id:
+                        player = load_player(player_id)
+                        # Send welcome message after successful registration
+                        await websocket.send_json({
+                            "type": "game_message",
+                            "message": f"Welcome, {name}! You have joined World of Wordcraft. Type 'look' to begin your adventure."
+                        })
+                        
+                elif command == "login":
+                    player_id, message = verify_player(name, password_hash)
+                    await websocket.send_json({
+                        "type": "auth_success" if player_id else "error",
+                        "message": message
+                    })
+                    if player_id:
+                        player = load_player(player_id)
+                        # Send welcome message after successful login with proper name casing
+                        await websocket.send_json({
+                            "type": "game_message",
+                            "message": f"Welcome back, {player['name_original']}! Type 'look' to see where you are."
+                        })
+                
+                if not player:
+                    continue
+
+                # Add to connected clients
+                connected_clients[player_id] = websocket
+
+            # Handle normal game commands
+            else:
+                try:
+                    response = game_logic.handle_action(player, message)
                     
                     # Handle theme changes
                     if isinstance(response, dict) and response["type"] == "theme":

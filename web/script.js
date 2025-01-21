@@ -1,6 +1,7 @@
 const output = document.getElementById('output');
 const input = document.getElementById('input');
 const sendButton = document.getElementById('send');
+const autoScroll = true; // Can be toggled by user preference
 
 // Dynamically determine WebSocket URL
 const wsUrl = 
@@ -11,13 +12,44 @@ const wsUrl =
 console.log(`Connecting to WebSocket server at: ${wsUrl}`);
 const ws = new WebSocket(wsUrl);
 
+function scrollToBottom() {
+    const lastMessage = output.lastElementChild;
+    if (lastMessage && autoScroll) {
+        lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+}
+
 // Append a message to the output log
 function appendToOutput(message) {
     const paragraph = document.createElement('p');
     paragraph.textContent = message;
     output.appendChild(paragraph);
-    output.scrollTop = output.scrollHeight; // Scroll to the bottom
+    scrollToBottom();
 }
+
+// Enhanced MutationObserver
+const observer = new MutationObserver((mutations) => {
+    if (mutations.some(m => m.addedNodes.length > 0)) {
+        scrollToBottom();
+    }
+});
+
+observer.observe(output, {
+    childList: true,
+    subtree: true
+});
+
+// Add scroll visibility check
+const scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (!entry.isIntersecting && entry.target === output.lastElementChild) {
+            scrollToBottom();
+        }
+    });
+}, {
+    root: output,
+    threshold: 1.0
+});
 
 // Handle WebSocket events
 ws.onopen = () => {
@@ -46,6 +78,16 @@ ws.onmessage = (event) => {
             appendToOutput(data.message);
         } else if (data.type === "error") {
             appendToOutput(`Error: ${data.message}`);
+        } else if (data.type === "fontsize") {
+            output.style.fontSize = `${data.size}px`;
+            localStorage.setItem('fontSize', data.size);
+            appendToOutput(data.message);
+        }
+        
+        // Observe the last message for visibility
+        const lastMessage = output.lastElementChild;
+        if (lastMessage) {
+            scrollObserver.observe(lastMessage);
         }
     } catch (error) {
         console.error("Failed to parse message:", error);
@@ -61,6 +103,12 @@ ws.onclose = () => {
 // Initialize theme from localStorage
 const savedTheme = localStorage.getItem('theme') || 'default';
 document.documentElement.setAttribute('data-theme', savedTheme);
+
+// Initialize font size from localStorage
+const savedFontSize = localStorage.getItem('fontSize');
+if (savedFontSize) {
+    output.style.fontSize = `${savedFontSize}px`;
+}
 
 // Send message to the server
 function sendMessage() {
