@@ -2,6 +2,8 @@ const output = document.getElementById('output');
 const input = document.getElementById('input');
 const sendButton = document.getElementById('send');
 const autoScroll = true; // Can be toggled by user preference
+let speechEnabled = localStorage.getItem('speechEnabled') === 'true';
+let speechRate = parseFloat(localStorage.getItem('speechRate')) || 1.0;
 
 // Dynamically determine WebSocket URL
 const wsUrl = 
@@ -25,6 +27,13 @@ function appendToOutput(message) {
     paragraph.textContent = message;
     output.appendChild(paragraph);
     scrollToBottom();
+    
+    // Speak message if enabled
+    if (speechEnabled && 'speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.rate = speechRate;
+        window.speechSynthesis.speak(utterance);
+    }
 }
 
 // Enhanced MutationObserver
@@ -119,14 +128,53 @@ function sanitizeCommand(command) {
     return command.replace(/[<>]/g, '');
 }
 
+// Add speech command handler
+function handleSpeechCommand(command) {
+    const parts = command.split(' ');
+    
+    if (parts[0] === 'speech') {
+        if (parts[1] === 'on') {
+            speechEnabled = true;
+            localStorage.setItem('speechEnabled', 'true');
+            appendToOutput("Text-to-speech enabled");
+            return true;
+        } else if (parts[1] === 'off') {
+            speechEnabled = false;
+            localStorage.setItem('speechEnabled', 'false');
+            appendToOutput("Text-to-speech disabled");
+            return true;
+        } else if (parts[1] === 'rate' && parts[2]) {
+            const rate = parseFloat(parts[2]);
+            if (rate >= 0.1 && rate <= 10) {
+                speechRate = rate;
+                localStorage.setItem('speechRate', rate.toString());
+                appendToOutput(`Speech rate set to ${rate}`);
+                return true;
+            }
+        }
+        appendToOutput("Usage: speech on|off|rate <0.1-10>");
+        return true;
+    }
+    return false;
+}
+
 // Send message to the server
 function sendMessage() {
     const command = sanitizeCommand(input.value.trim());
+    if (!command) return;
+    
+    if (command.length > 1000) {
+        appendToOutput("Error: Command too long");
+        return;
+    }
+    
+    // Handle speech commands locally
+    if (handleSpeechCommand(command)) {
+        input.value = '';
+        return;
+    }
+    
     if (command && ws.readyState === WebSocket.OPEN) {
-        if (command.length > 1000) {
-            appendToOutput("Error: Command too long");
-            return;
-        }
         console.log(`Sending command: ${command}`);
         appendToOutput(`> ${command}`); // Display the command in the output
         ws.send(command); // Send the command to the server

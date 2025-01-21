@@ -89,6 +89,20 @@ ALLOWED_COMMANDS.update({
     "inspect"
 })
 
+# Add to ALLOWED_COMMANDS
+ALLOWED_COMMANDS.update({
+    "speech"
+})
+
+# Update help message
+HELP_MESSAGE = """Enter 'login <name> <password>' or 'register <name> <password>'.
+
+Available accessibility commands:
+- highcontrast on/off
+- fontsize <number>
+- speech on/off
+- speech rate <0.1-10>"""
+
 # Rate limiting storage
 rate_limits: Dict[str, list] = defaultdict(list)
 
