@@ -1,10 +1,21 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.security import APIKeyCookie
 from pathlib import Path
-from app.database import init_db, load_player, save_player, update_player_location, get_players_in_room, create_player, verify_player
+from app.database import init_db, load_player, save_player, create_player, verify_player
 from app.game_logic import game_logic 
 import hashlib
+from datetime import datetime, timedelta
+import re
+from typing import Dict
+from collections import defaultdict
+import html
+import os
+from dotenv import load_dotenv
+import jwt
+
+load_dotenv()
 
 # Base directory for static files
 WEB_DIR = Path(__file__).parent.parent / "web"
@@ -39,10 +50,64 @@ async def static_files(filename: str):
 # WebSocket connections
 connected_clients = {}
 
+# Rate limiting settings
+RATE_LIMIT = 5  # messages per second
+RATE_WINDOW = 1  # seconds
+MESSAGE_SIZE_LIMIT = 1000  # characters
+
+# Security settings
+SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+TOKEN_EXPIRY = timedelta(hours=24)
+ALLOWED_COMMANDS = {
+    "look", "go", "take", "inventory", "logout", "highcontrast", "fontsize",
+    "interact", "use", "solve", "register", "login", "l", "i"
+}
+
+# Rate limiting storage
+rate_limits: Dict[str, list] = defaultdict(list)
+
+def sanitize_input(message: str) -> str:
+    """Sanitize user input"""
+    # Remove any non-alphanumeric chars except spaces and common punctuation
+    sanitized = re.sub(r'[^a-zA-Z0-9\s\-_.,!?]', '', message)
+    # Escape HTML
+    sanitized = html.escape(sanitized)
+    return sanitized[:MESSAGE_SIZE_LIMIT]
+
+def check_rate_limit(client_id: str) -> bool:
+    """Check if client has exceeded rate limit"""
+    now = datetime.now()
+    # Clean up old timestamps
+    rate_limits[client_id] = [t for t in rate_limits[client_id] 
+                             if (now - t).total_seconds() < RATE_WINDOW]
+    
+    if len(rate_limits[client_id]) >= RATE_LIMIT:
+        return False
+        
+    rate_limits[client_id].append(now)
+    return True
+
+def create_token(player_id: str) -> str:
+    """Create JWT token for authenticated player"""
+    payload = {
+        "sub": player_id,
+        "exp": datetime.utcnow() + TOKEN_EXPIRY
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+def verify_token(token: str) -> str:
+    """Verify JWT token and return player_id"""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        return payload["sub"]
+    except jwt.InvalidTokenError:
+        return None
+
 @fastapi_app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     player = None
+    client_id = f"{websocket.client.host}:{websocket.client.port}"
     
     try:
         await websocket.send_json({
@@ -52,6 +117,29 @@ async def websocket_endpoint(websocket: WebSocket):
         
         while True:
             message = await websocket.receive_text()
+            
+            # Rate limiting check
+            if not check_rate_limit(client_id):
+                await websocket.send_json({
+                    "type": "error",
+                    "message": "Too many requests. Please slow down."
+                })
+                await websocket.close(code=1008, reason="Rate limit exceeded")
+                return
+                
+            # Input validation
+            message = sanitize_input(message)
+            if not message:
+                continue
+                
+            # Command validation
+            command = message.split()[0].lower()
+            if command not in ALLOWED_COMMANDS:
+                await websocket.send_json({
+                    "type": "error",
+                    "message": "Invalid command."
+                })
+                continue
             
             # Handle pre-auth commands
             if message.startswith("highcontrast "):
@@ -99,7 +187,13 @@ async def websocket_endpoint(websocket: WebSocket):
                         "message": message
                     })
                     if player_id:
+                        token = create_token(player_id)
                         player = load_player(player_id)
+                        await websocket.send_json({
+                            "type": "auth_success",
+                            "token": token,
+                            "message": message
+                        })
                         # Send welcome message after successful registration
                         await websocket.send_json({
                             "type": "game_message",
@@ -113,7 +207,13 @@ async def websocket_endpoint(websocket: WebSocket):
                         "message": message
                     })
                     if player_id:
+                        token = create_token(player_id)
                         player = load_player(player_id)
+                        await websocket.send_json({
+                            "type": "auth_success",
+                            "token": token,
+                            "message": message
+                        })
                         # Send welcome message after successful login with proper name casing
                         await websocket.send_json({
                             "type": "game_message",
@@ -166,6 +266,8 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         if player:
             del connected_clients[player['id']]
+        if client_id in rate_limits:
+            del rate_limits[client_id]
         print(f"Client {player['id'] if player else 'unknown'} disconnected")
     finally:
         if player:

@@ -12,6 +12,8 @@ class ActionHandler:
             return self._handle_highcontrast(action)
         elif action == "logout":
             return self._handle_logout(player)
+        elif action in ["inventory", "i"]:
+            return self._handle_inventory(player)
         elif action in self.direction_mapping:
             action = f"go {self.direction_mapping[action]}"
 
@@ -107,3 +109,12 @@ class ActionHandler:
             "theme": "high-contrast" if setting == "on" else "default",
             "message": f"High contrast mode turned {setting}."
         }
+
+    def _handle_inventory(self, player):
+        """Display player's inventory."""
+        items = player.get("inventory", [])
+        if not items:
+            return "Your inventory is empty."
+            
+        item_list = [item["name"] for item in items]
+        return f"Your inventory contains:\n{', '.join(item_list)}"

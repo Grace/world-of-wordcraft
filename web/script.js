@@ -110,10 +110,20 @@ if (savedFontSize) {
     output.style.fontSize = `${savedFontSize}px`;
 }
 
+// Sanitize command input
+function sanitizeCommand(command) {
+    // Remove any potentially harmful characters
+    return command.replace(/[<>]/g, '');
+}
+
 // Send message to the server
 function sendMessage() {
-    const command = input.value.trim();
+    const command = sanitizeCommand(input.value.trim());
     if (command && ws.readyState === WebSocket.OPEN) {
+        if (command.length > 1000) {
+            appendToOutput("Error: Command too long");
+            return;
+        }
         console.log(`Sending command: ${command}`);
         appendToOutput(`> ${command}`); // Display the command in the output
         ws.send(command); // Send the command to the server
