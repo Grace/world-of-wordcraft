@@ -76,9 +76,12 @@ async def websocket_endpoint(websocket: WebSocket):
             print(f"Command received: {command}")
             if command:
                 response = handle_action(player, command)
-                player_room = player["location"]  # Update player's current room
-                save_player(player_id, player)
-                await websocket.send_json({"message": response})
+                # Ensure response is a string
+                message = response if isinstance(response, str) else str(response)
+                await websocket.send_json({
+                    "type": "game_message",
+                    "message": message
+                })
 
     except WebSocketDisconnect:
         print(f"WebSocket disconnected: {player_id}")

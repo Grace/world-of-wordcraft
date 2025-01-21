@@ -31,8 +31,27 @@ ws.onerror = (error) => {
 };
 
 ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    appendToOutput(data.message);
+    try {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === "error") {
+            console.error(data.message);
+            appendToOutput(`Error: ${data.message}`);
+        } else if (data.type === "game_message") {
+            // Format the message content
+            const message = typeof data.message === 'object' ? 
+                JSON.stringify(data.message, null, 2) : 
+                data.message.toString();
+            
+            appendToOutput(message);
+        } else {
+            console.warn("Unknown message type:", data.type);
+            appendToOutput("Received unknown message type from server");
+        }
+    } catch (error) {
+        console.error("Failed to parse message:", error);
+        appendToOutput("Error: Failed to parse server message");
+    }
 };
 
 ws.onclose = () => {
