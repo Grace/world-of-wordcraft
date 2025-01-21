@@ -16,8 +16,9 @@ A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as M
 
 ## Deployment
 1. Clone the repository.
-2. Set up a Railway project and add `OPENAI_API_KEY` to environment variables.
-3. Run `railway up` to deploy.
+2. Set up a Railway project and add your `OPENAI_API_KEY` to environment variables.
+3. Create a `JWT_SECRET_KEY` (ask ChatGPT to generate one if you don't know how) and add it to environment variables.
+4. Run `railway up` to deploy.
 
 ## Local Development
 1. Install dependencies: `pip install -r requirements.txt`.
