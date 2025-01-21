@@ -36,3 +36,5 @@ A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as M
 - [ ] Add level/experience system
 - [ ] Add player classes
 - [ ] Add support for PostgreSQL instead of or in addition to SQLite
+- [ ] Setup unit and/or integration tests
+- [ ] Setup development build/deployment
