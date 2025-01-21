@@ -9,10 +9,6 @@ Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! T
 - If you encounter disconnections or errors, simply refresh the page and try again after a minute. The app may go into sleep mode during periods of low traffic to conserve resources.  
 - For the best experience, use a modern browser with WebSocket support enabled.
 
-
-## Description
-A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as MUDs) designed for accessibility. In-game worldbuilding generated with OpenAI.
-
 ## Features  
 - **Text-to-Speech Accessibility**: Activate with the `speech on` command to narrate game events, offering a hands-free, immersive experience. Replay recent updates with the `speech repeat` command.  
 - **Dynamic Room Generation**: Immersive environments crafted with OpenAI, with an evolving game engine to add structure to the creative chaos of AI-generated content.  
