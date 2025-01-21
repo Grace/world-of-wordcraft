@@ -1,5 +1,5 @@
 # World of Wordcraft
-Proof of concept for an open-source, text-based MMORPG designed for accessibility. In-game worldbuilding generated with OpenAI.
+A love letter to MUD games and early MMORPGs from the 80s and 90s, designed for accessibility. In-game worldbuilding generated with OpenAI.
 
 ## Game Demo
 Link to play the game in your browser: [https://world-of-wordcraft.up.railway.app/](https://world-of-wordcraft.up.railway.app/)
