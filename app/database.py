@@ -257,3 +257,30 @@ def grant_role(player_id, role_id, granter_id):
         return True, "Role granted successfully"
     finally:
         conn.close()
+
+def ban_player(target_id, banner_id, reason=None):
+    """Ban a player."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("""
+            INSERT INTO banned_players (player_id, banned_by, reason)
+            VALUES (?, ?, ?)
+        """, (target_id, banner_id, reason))
+        conn.commit()
+        return True
+    finally:
+        conn.close()
+
+def is_banned(player_id):
+    """Check if player is banned."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT reason FROM banned_players WHERE player_id = ?", (player_id,))
+        result = cursor.fetchone()
+        return result[0] if result else None
+    finally:
+        conn.close()

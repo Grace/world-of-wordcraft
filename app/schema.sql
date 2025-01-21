@@ -33,6 +33,14 @@ INSERT OR IGNORE INTO roles (id, name, permissions) VALUES
     ('moderator', 'Moderator', '["look", "go", "take", "inventory", "logout", "highcontrast", "fontsize", "interact", "use", "solve", "kick", "mute", "ban", "edit_room"]'),
     ('admin', 'Admin', '["look", "go", "take", "inventory", "logout", "highcontrast", "fontsize", "interact", "use", "solve", "kick", "mute", "ban", "edit_room", "grant_role", "spawn_item", "teleport"]');
 
+-- Add banned players table
+CREATE TABLE IF NOT EXISTS banned_players (
+    player_id TEXT PRIMARY KEY REFERENCES players(id),
+    banned_by TEXT NOT NULL REFERENCES players(id),
+    reason TEXT,
+    banned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Add indexes for performance
 CREATE INDEX IF NOT EXISTS idx_player_name ON players(name COLLATE NOCASE);
 CREATE INDEX IF NOT EXISTS idx_room_coordinates ON rooms(coordinates);

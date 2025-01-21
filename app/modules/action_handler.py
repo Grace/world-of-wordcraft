@@ -1,4 +1,12 @@
-from app.database import check_permission, save_room, update_player_location, get_room, get_players_in_room, load_player
+from app.database import (
+    check_permission, 
+    save_room, 
+    update_player_location, 
+    get_room, 
+    get_players_in_room, 
+    load_player,
+    ban_player
+)
 
 class ActionHandler:
     def __init__(self, connected_clients=None):
@@ -122,7 +130,8 @@ class ActionHandler:
         try:
             return {
                 "type": "logout", 
-                "message": f"Goodbye, {player['name_original']}! Come back soon."
+                "message": f"Goodbye, {player['name_original']}! Come back soon.",
+                "player_id": player["id"]
             }
         except KeyError:
             return {
@@ -230,7 +239,24 @@ class ActionHandler:
         
     def _handle_ban(self, player, action, room):
         """Ban a player (mod+ only)."""
-        parts = action.split()
+        parts = action.split(None, 2)
         if len(parts) < 2:
-            return "Usage: ban <player_name>"
-        return f"Banned player {parts[1]}"
+            return "Usage: ban <player_name> [reason]"
+            
+        target_name = parts[1].lower()
+        reason = parts[2] if len(parts) > 2 else "No reason provided"
+        
+        # Find target player
+        for player_id, websocket in self.connected_clients.items():
+            target = load_player(player_id)
+            if target and target["name"].lower() == target_name:
+                if ban_player(target["id"], player["id"], reason):
+                    return {
+                        "type": "ban",
+                        "target_id": player_id,
+                        "admin_message": f"Player {target['name_original']} has been banned by {player['name_original']}. Reason: {reason}",
+                        "player_message": f"You have been banned. Reason: {reason}"
+                    }
+                return "Failed to ban player"
+                    
+        return f"Player {parts[1]} not found or not online."

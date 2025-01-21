@@ -3,8 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.security import APIKeyCookie
 from pathlib import Path
-from app.database import init_db, load_player, save_player, create_player, verify_player
-from app.game_logic import GameLogic  # Import class instead of instance
+from app.database import (
+    init_db, 
+    load_player, 
+    save_player, 
+    create_player, 
+    verify_player,
+    is_banned
+)
+from app.game_logic import GameLogic
 import hashlib
 from datetime import datetime, timedelta
 import re
@@ -223,6 +230,17 @@ async def websocket_endpoint(websocket: WebSocket):
                     if not player:
                         continue
 
+                    # Check ban status after login/register
+                    if player:
+                        ban_reason = is_banned(player["id"])
+                        if ban_reason:
+                            await websocket.send_json({
+                                "type": "error",
+                                "message": f"You are banned. Reason: {ban_reason}"
+                            })
+                            await websocket.close(code=1008, reason="Banned")
+                            return
+
                     # Add to connected clients
                     connected_clients[player_id] = websocket
 
@@ -233,6 +251,15 @@ async def websocket_endpoint(websocket: WebSocket):
                         
                         # Handle special responses
                         if isinstance(response, dict):
+                            if response["type"] == "logout":
+                                await websocket.send_json({
+                                    "type": "game_message",
+                                    "message": response["message"]
+                                })
+                                if player["id"] in connected_clients:
+                                    del connected_clients[player["id"]]
+                                await websocket.close()
+                                return
                             if response["type"] == "kick":
                                 target_websocket = connected_clients.get(response["target_id"])
                                 if target_websocket:
@@ -244,6 +271,20 @@ async def websocket_endpoint(websocket: WebSocket):
                                 await websocket.send_json({
                                     "type": "game_message",
                                     "message": response["message"]
+                                })
+                                continue
+                            # Handle ban response
+                            if isinstance(response, dict) and response["type"] == "ban":
+                                target_websocket = connected_clients.get(response["target_id"])
+                                if target_websocket:
+                                    await target_websocket.send_json({
+                                        "type": "error",
+                                        "message": response["player_message"]
+                                    })
+                                    await target_websocket.close(code=1008, reason="Banned")
+                                await websocket.send_json({
+                                    "type": "game_message",
+                                    "message": response["admin_message"]
                                 })
                                 continue
                         
