@@ -169,7 +169,7 @@ def create_player(name, password_hash):
                 VALUES (?, ?, ?, ?, 0, 0, 0, '[]')
             """, (player_id, name.lower(), name, password_hash))
             conn.commit()
-            return player_id, "Account created successfully"
+            return player_id, None
         except sqlite3.IntegrityError:
             return None, "Player name already exists"
     finally:
@@ -191,6 +191,6 @@ def verify_player(name, password_hash):
             return None, "Player not found"
         if result[1] != password_hash:
             return None, "Invalid password"
-        return result[0], "Login successful"
+        return result[0], None 
     finally:
         conn.close()

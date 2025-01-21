@@ -182,42 +182,31 @@ async def websocket_endpoint(websocket: WebSocket):
                 
                 if command == "register":
                     player_id, message = create_player(name, password_hash)
-                    await websocket.send_json({
-                        "type": "auth_success" if player_id else "error",
-                        "message": message
-                    })
                     if player_id:
-                        token = create_token(player_id)
                         player = load_player(player_id)
+                        # Only send one success message
                         await websocket.send_json({
                             "type": "auth_success",
-                            "token": token,
-                            "message": message
+                            "message": "Account created successfully. Welcome to World of Wordcraft!"
                         })
-                        # Send welcome message after successful registration
+                    else:
                         await websocket.send_json({
-                            "type": "game_message",
-                            "message": f"Welcome, {name}! You have joined World of Wordcraft. Type 'look' to begin your adventure."
+                            "type": "error",
+                            "message": message
                         })
                         
                 elif command == "login":
                     player_id, message = verify_player(name, password_hash)
-                    await websocket.send_json({
-                        "type": "auth_success" if player_id else "error",
-                        "message": message
-                    })
                     if player_id:
-                        token = create_token(player_id)
                         player = load_player(player_id)
                         await websocket.send_json({
                             "type": "auth_success",
-                            "token": token,
-                            "message": message
-                        })
-                        # Send welcome message after successful login with proper name casing
-                        await websocket.send_json({
-                            "type": "game_message",
                             "message": f"Welcome back, {player['name_original']}! Type 'look' to see where you are."
+                        })
+                    else:
+                        await websocket.send_json({
+                            "type": "error",
+                            "message": message
                         })
                 
                 if not player:

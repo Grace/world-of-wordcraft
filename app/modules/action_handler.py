@@ -4,7 +4,9 @@ class ActionHandler:
     def __init__(self):
         self.direction_mapping = {
             "n": "north", "s": "south", "e": "east", "w": "west",
-            "u": "up", "d": "down"
+            "u": "up", "d": "down",
+            "north": "north", "south": "south", "east": "east", "west": "west",
+            "up": "up", "down": "down"
         }
 
     def handle(self, player, action, room):
@@ -29,8 +31,11 @@ class ActionHandler:
         return "Invalid command."
 
     def _handle_movement(self, player, action, room):
-        direction = action.split(" ", 1)[1]
-        if direction in room["exits"]:
+        # Get full direction name from mapping
+        raw_direction = action.split(" ", 1)[1]
+        direction = self.direction_mapping.get(raw_direction.lower())
+        
+        if direction and direction in room["exits"]:
             x, y, z = player["location"]
             if direction == "north": y += 1
             elif direction == "south": y -= 1
@@ -43,7 +48,7 @@ class ActionHandler:
             update_player_location(player["id"], (x, y, z))
             return f"You move {direction}."
         
-        return f"You cannot go {direction}."
+        return f"You cannot go {raw_direction}."
 
     def _handle_look(self, player, room):
         # Get players in room excluding current player
