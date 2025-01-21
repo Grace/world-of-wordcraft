@@ -27,6 +27,7 @@ A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as M
 
 ## Extra Goals
 - [ ] Make room generation be based on exits described in previously generated, connected rooms
+- [ ] Implement help command for more information about other commands
 - [x] Add roles such as moderator and admin with varying priviledges
 - [ ] Make rooms, NPCs, items, and interactions editable by moderators and/or admins
 - [x] Add player chat system (say, yell, tell)

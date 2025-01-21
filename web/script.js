@@ -151,8 +151,18 @@ function handleSpeechCommand(command) {
                 appendToOutput(`Speech rate set to ${rate}`);
                 return true;
             }
+        } else if (parts[1] === 'repeat') {
+            if ('speechSynthesis' in window) {
+                const visibleText = output.textContent;
+                const utterance = new SpeechSynthesisUtterance(visibleText);
+                utterance.rate = speechRate;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                appendToOutput("Text-to-speech is not supported in your browser.");
+            }
+            return true;
         }
-        appendToOutput("Usage: speech on|off|rate <0.1-10>");
+        appendToOutput("Usage: speech on|off|rate <0.1-10>|repeat");
         return true;
     }
     return false;

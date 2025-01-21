@@ -95,13 +95,20 @@ ALLOWED_COMMANDS.update({
 })
 
 # Update help message
-REGISTER_OR_LOGIN_MESSAGE = """Welcome to World of Wordcraft!\n\nEnter 'login <name> <password>' or 'register <name> <password>'.
+REGISTER_OR_LOGIN_MESSAGE = """Welcome to World of Wordcraft!
+
+
+Enter 'login <name> <password>' or 'register <name> <password>'.
+
+Type 'help <command>' for more info on a specific command.
+
 
 Available accessibility commands:
 - highcontrast on/off
 - fontsize <number>
 - speech on/off
-- speech rate <0.1-10>"""
+- speech rate <0.1-10>
+- speech repeat"""
 
 # Rate limiting storage
 rate_limits: Dict[str, list] = defaultdict(list)
