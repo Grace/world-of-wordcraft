@@ -1,7 +1,8 @@
 -- Initial schema creation
 CREATE TABLE IF NOT EXISTS players (
     id TEXT PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL COLLATE NOCASE UNIQUE,
+    name_original TEXT NOT NULL,
     password_hash TEXT NOT NULL,
     location_x INTEGER DEFAULT 0,
     location_y INTEGER DEFAULT 0,
@@ -10,8 +11,7 @@ CREATE TABLE IF NOT EXISTS players (
 );
 
 CREATE TABLE IF NOT EXISTS rooms (
-    id TEXT PRIMARY KEY,
-    coordinates TEXT UNIQUE NOT NULL,
+    coordinates TEXT PRIMARY KEY,
     description TEXT NOT NULL,
     exits TEXT DEFAULT '{}',
     npcs TEXT DEFAULT '[]',
@@ -20,5 +20,5 @@ CREATE TABLE IF NOT EXISTS rooms (
 );
 
 -- Add indexes for performance
-CREATE INDEX IF NOT EXISTS idx_player_name ON players(name);
+CREATE INDEX IF NOT EXISTS idx_player_name ON players(name COLLATE NOCASE);
 CREATE INDEX IF NOT EXISTS idx_room_coordinates ON rooms(coordinates);

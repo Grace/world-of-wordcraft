@@ -43,13 +43,14 @@ connected_clients = {}
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     player = None
+    
     try:
         # Auth request
         await websocket.send_json({
             "type": "auth_request",
             "message": "Enter 'login <name> <password>' or 'register <name> <password>'"
         })
-
+        
         # Handle login/register
         auth_message = await websocket.receive_text()
         parts = auth_message.split()
@@ -66,15 +67,33 @@ async def websocket_endpoint(websocket: WebSocket):
         
         if command == "register":
             player_id, message = create_player(name, password_hash)
+            await websocket.send_json({
+                "type": "auth_success" if player_id else "error",
+                "message": message
+            })
             if player_id:
                 player = load_player(player_id)
+                # Send welcome message after successful registration
+                await websocket.send_json({
+                    "type": "game_message",
+                    "message": f"Welcome, {name}! You have joined World of Wordcraft. Type 'look' to begin your adventure."
+                })
+                
         elif command == "login":
             player_id, message = verify_player(name, password_hash)
+            await websocket.send_json({
+                "type": "auth_success" if player_id else "error",
+                "message": message
+            })
             if player_id:
                 player = load_player(player_id)
+                # Send welcome message after successful login with proper name casing
+                await websocket.send_json({
+                    "type": "game_message",
+                    "message": f"Welcome back, {player['name_original']}! Type 'look' to see where you are."
+                })
         
         if not player:
-            await websocket.send_json({"type": "error", "message": "Authentication failed"})
             return
 
         # Game loop

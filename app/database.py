@@ -76,24 +76,28 @@ def save_player(player_id, player_data):
     conn.close()
 
 def load_player(player_id):
-    """Load a player's data from the database."""
-    conn = sqlite3.connect(DB_FILE)
+    conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("""
-        SELECT name, location_x, location_y, location_z, inventory
-        FROM players
-        WHERE id = ?
-    """, (player_id,))
-    result = cursor.fetchone()
-    conn.close()
-    if result:
-        return {
-            "id": player_id,
-            "name": result[0],
-            "location": (result[1], result[2], result[3]),
-            "inventory": json.loads(result[4]),
-        }
-    return None
+    
+    try:
+        cursor.execute("""
+            SELECT name_original, location_x, location_y, location_z, inventory 
+            FROM players WHERE id = ?
+        """, (player_id,))
+        result = cursor.fetchone()
+        
+        if result:
+            name_original, x, y, z, inventory = result
+            return {
+                "id": player_id,
+                "name": name_original.lower(),
+                "name_original": name_original,
+                "location": (x, y, z),
+                "inventory": json.loads(inventory)
+            }
+        return None
+    finally:
+        conn.close()
 
 def get_players_in_room(location, exclude=None):
     """
@@ -144,36 +148,38 @@ def update_player_location(player_id, location):
         conn.close()
 
 def create_player(name, password_hash):
-    """Create a new player account."""
+    """Create a new player account with case-insensitive name."""
     conn = get_connection()
     cursor = conn.cursor()
     
     try:
-        # Check if player exists
-        cursor.execute("SELECT id FROM players WHERE name = ?", (name,))
+        # Check if player exists (case-insensitive)
+        cursor.execute("SELECT id FROM players WHERE name = ? COLLATE NOCASE", (name,))
         if cursor.fetchone():
             return None, "Player name already exists"
             
         player_id = f"player_{name.lower()}"
-        cursor.execute("""
-            INSERT INTO players (id, name, password_hash, location_x, location_y, location_z, inventory)
-            VALUES (?, ?, ?, 0, 0, 0, '[]')
-        """, (player_id, name, password_hash))
-        
-        conn.commit()
-        return player_id, "Account created successfully"
+        try:
+            cursor.execute("""
+                INSERT INTO players (id, name, name_original, password_hash, location_x, location_y, location_z, inventory)
+                VALUES (?, ?, ?, ?, 0, 0, 0, '[]')
+            """, (player_id, name.lower(), name, password_hash))
+            conn.commit()
+            return player_id, "Account created successfully"
+        except sqlite3.IntegrityError:
+            return None, "Player name already exists"
     finally:
         conn.close()
 
 def verify_player(name, password_hash):
-    """Verify player credentials."""
+    """Verify player credentials with case-insensitive name."""
     conn = get_connection()
     cursor = conn.cursor()
     
     try:
         cursor.execute("""
             SELECT id, password_hash FROM players 
-            WHERE name = ?
+            WHERE name = ? COLLATE NOCASE
         """, (name,))
         result = cursor.fetchone()
         

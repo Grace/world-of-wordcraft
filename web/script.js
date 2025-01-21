@@ -34,8 +34,10 @@ ws.onmessage = (event) => {
     try {
         const data = JSON.parse(event.data);
         
-        if (data.type === "auth_request" || data.type === "auth_success") {
+        if (data.type === "auth_request") {
             appendToOutput(data.message);
+        } else if (data.type === "auth_success") {
+            appendToOutput(`Login successful: ${data.message}`);
         } else if (data.type === "error") {
             appendToOutput(`Error: ${data.message}`);
         } else if (data.type === "game_message") {

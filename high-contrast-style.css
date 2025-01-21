@@ -1,0 +1,157 @@
+root {
+    --bg-primary: #212529;
+    --bg-secondary: #2c3338;
+    --text-primary: #4aa52e;
+    --border-color: #4aa52e;
+    --input-bg: #000000;
+}
+
+[data-high-contrast="true"] {
+    --bg-primary: #000000;
+    --bg-secondary: #000000;
+    --text-primary: #ffffff;
+    --border-color: #ffffff;
+    --input-bg: #000000;
+}
+
+.settings-container {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 100;
+}
+
+.settings-dialog {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 300px;
+    margin-top: 0.5rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary) !important;
+    border: 4px solid var(--border-color) !important;
+}
+
+.setting-control {
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.setting-description {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-color: var(--bg-primary);
+    font-family: 'Press Start 2P', cursive;
+    overflow: hidden;
+}
+
+/* Game container */
+#game {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color) !important;
+}
+
+/* Title styles */
+#title {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Output container styles */
+#output-container {
+    flex-grow: 1;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    overflow-y: auto;
+    background-color: var(--bg-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+#output {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    color: var(--text-primary);
+}
+
+#output p {
+    margin: 0.5rem 0;
+}
+
+/* Input form styles */
+#input-form {
+    margin-top: auto;
+}
+
+.input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+#input {
+    flex-grow: 1;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    border-color: var(--border-color) !important;
+}
+
+#input::placeholder {
+    color: #45a049;
+    opacity: 0.5;
+}
+
+#send {
+    min-width: 80px;
+}
+
+/* Screen reader only */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #game {
+        padding: 0.5rem;
+    }
+
+    #title {
+        font-size: 1.2rem;
+    }
+
+    #output {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .input-group {
+        flex-direction: column;
+    }
+
+    #send {
+        width: 100%;
+    }
+}
