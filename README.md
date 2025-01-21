@@ -45,4 +45,4 @@ A love letter to early MMORPGs from the 70s, 80s, and early 90s (also known as M
 - [ ] Setup development build/deployment
 
 ## Disclaimer
-This project has no relation to any commercial MMORPGs, despite the name being a dad-joke level pun. This is an open source project meant to learn how to best utilize AI to generate textual game content. Any similarities of generated game content to existing copyrighted material is a coincidence.
+This project is entirely unrelated to any commercial MMORPGs, despite its name being a playful pun. It is an open-source initiative focused on exploring the effective use of AI for generating textual game content. Any resemblance between the generated content and existing copyrighted material is purely coincidental.
