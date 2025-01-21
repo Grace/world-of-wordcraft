@@ -1,4 +1,12 @@
 :root {
+    --bg-primary: #000000;
+    --bg-secondary: #000000;
+    --text-primary: #ffffff;
+    --border-color: #ffffff;
+    --input-bg: #000000;
+}
+
+[data-theme="default"] {
     --bg-primary: #212529;
     --bg-secondary: #2c3338;
     --text-primary: #4aa52e;

@@ -100,8 +100,8 @@ ws.onclose = () => {
     appendToOutput("Disconnected from the server.");
 };
 
-// Initialize theme from localStorage
-const savedTheme = localStorage.getItem('theme') || 'default';
+// Initialize theme from localStorage - default to high-contrast
+const savedTheme = localStorage.getItem('theme') || 'high-contrast';
 document.documentElement.setAttribute('data-theme', savedTheme);
 
 // Initialize font size from localStorage
