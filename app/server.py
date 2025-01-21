@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 from fastapi.security import APIKeyCookie
 from pathlib import Path
 from app.database import init_db, load_player, save_player, create_player, verify_player
-from app.game_logic import game_logic 
+from app.game_logic import GameLogic  # Import class instead of instance
 import hashlib
 from datetime import datetime, timedelta
 import re
@@ -49,6 +49,9 @@ async def static_files(filename: str):
 
 # WebSocket connections
 connected_clients = {}
+
+# Create game logic instance
+game_logic = GameLogic(connected_clients)
 
 # Rate limiting settings
 RATE_LIMIT = 5  # messages per second
@@ -116,157 +119,162 @@ async def websocket_endpoint(websocket: WebSocket):
     client_id = f"{websocket.client.host}:{websocket.client.port}"
     
     try:
+        # Initial auth request
         await websocket.send_json({
             "type": "auth_request",
             "message": "Enter 'login <name> <password>' or 'register <name> <password>'.\nAvailable commands:\n- highcontrast on/off\n- fontsize <number>"
         })
         
         while True:
-            message = await websocket.receive_text()
-            
-            # Rate limiting check
-            if not check_rate_limit(client_id):
-                await websocket.send_json({
-                    "type": "error",
-                    "message": "Too many requests. Please slow down."
-                })
-                await websocket.close(code=1008, reason="Rate limit exceeded")
-                return
+            try:
+                message = await websocket.receive_text()
                 
-            # Input validation
-            message = sanitize_input(message)
-            if not message:
-                continue
-                
-            # Command validation
-            command = message.split()[0].lower()
-            if command not in ALLOWED_COMMANDS:
-                await websocket.send_json({
-                    "type": "error",
-                    "message": "Invalid command."
-                })
-                continue
-            
-            # Handle pre-auth commands
-            if message.startswith("highcontrast "):
-                setting = message.split(" ")[1].lower()
-                if setting in ["on", "off"]:
-                    await websocket.send_json({
-                        "type": "theme",
-                        "theme": "high-contrast" if setting == "on" else "default",
-                        "message": f"High contrast mode turned {setting}."
-                    })
-                continue
-            elif message.startswith("fontsize "):
-                try:
-                    size = int(message.split(" ")[1])
-                    await websocket.send_json({
-                        "type": "fontsize",
-                        "size": size,
-                        "message": f"Font size set to {size}px."
-                    })
-                    continue
-                except (IndexError, ValueError):
+                # Rate limiting check
+                if not check_rate_limit(client_id):
                     await websocket.send_json({
                         "type": "error",
-                        "message": "Usage: fontsize <number>"
+                        "message": "Too many requests. Please slow down."
                     })
-                    continue
-                
-            # Handle auth flow
-            if not player:
-                parts = message.split()
-                if len(parts) < 3:
-                    await websocket.send_json({
-                        "type": "error",
-                        "message": "Invalid format. Use: login/register <name> <password>"
-                    })
-                    continue
-
-                command, name, password = parts[0], parts[1], parts[2]
-                password_hash = hashlib.sha256(password.encode()).hexdigest()
-                
-                if command == "register":
-                    player_id, message = create_player(name, password_hash)
-                    if player_id:
-                        player = load_player(player_id)
-                        # Only send one success message
-                        await websocket.send_json({
-                            "type": "auth_success",
-                            "message": "Account created successfully. Welcome to World of Wordcraft!\n\nType 'look' to see where you are."
-                        })
-                    else:
-                        await websocket.send_json({
-                            "type": "error",
-                            "message": message
-                        })
-                        
-                elif command == "login":
-                    player_id, message = verify_player(name, password_hash)
-                    if player_id:
-                        player = load_player(player_id)
-                        await websocket.send_json({
-                            "type": "auth_success",
-                            "message": f"Welcome back, {player['name_original']}!\n\nType 'look' to see where you are."
-                        })
-                    else:
-                        await websocket.send_json({
-                            "type": "error",
-                            "message": message
-                        })
-                
-                if not player:
-                    continue
-
-                # Add to connected clients
-                connected_clients[player_id] = websocket
-
-            # Handle normal game commands
-            else:
-                try:
-                    response = game_logic.handle_action(player, message)
+                    await websocket.close(code=1008, reason="Rate limit exceeded")
+                    return
                     
-                    # Handle theme changes
-                    if isinstance(response, dict) and response["type"] == "theme":
-                        await websocket.send_json(response)
-                    # Handle logout command
-                    elif isinstance(response, dict) and response["type"] == "logout":
-                        try:
-                            save_player(player['id'], player)
-                            del connected_clients[player['id']]
+                # Input validation
+                message = sanitize_input(message)
+                if not message:
+                    continue
+                    
+                # Command validation
+                command = message.split()[0].lower()
+                if command not in ALLOWED_COMMANDS:
+                    await websocket.send_json({
+                        "type": "error",
+                        "message": "Invalid command."
+                    })
+                    continue
+                
+                # Handle pre-auth commands
+                if message.startswith("highcontrast "):
+                    setting = message.split(" ")[1].lower()
+                    if setting in ["on", "off"]:
+                        await websocket.send_json({
+                            "type": "theme",
+                            "theme": "high-contrast" if setting == "on" else "default",
+                            "message": f"High contrast mode turned {setting}."
+                        })
+                    continue
+                elif message.startswith("fontsize "):
+                    try:
+                        size = int(message.split(" ")[1])
+                        await websocket.send_json({
+                            "type": "fontsize",
+                            "size": size,
+                            "message": f"Font size set to {size}px."
+                        })
+                        continue
+                    except (IndexError, ValueError):
+                        await websocket.send_json({
+                            "type": "error",
+                            "message": "Usage: fontsize <number>"
+                        })
+                        continue
+                    
+                # Handle auth flow
+                if not player:
+                    parts = message.split()
+                    if len(parts) < 3:
+                        await websocket.send_json({
+                            "type": "error",
+                            "message": "Invalid format. Use: login/register <name> <password>"
+                        })
+                        continue
+
+                    command, name, password = parts[0], parts[1], parts[2]
+                    password_hash = hashlib.sha256(password.encode()).hexdigest()
+                    
+                    if command == "register":
+                        player_id, message = create_player(name, password_hash)
+                        if player_id:
+                            player = load_player(player_id)
+                            # Only send one success message
                             await websocket.send_json({
-                                "type": "game_message",
-                                "message": response["message"]
+                                "type": "auth_success",
+                                "message": "Account created successfully. Welcome to World of Wordcraft!\n\nType 'look' to see where you are."
                             })
-                            await websocket.close()
-                            return
-                        except Exception as e:
+                        else:
                             await websocket.send_json({
                                 "type": "error",
-                                "message": "Error during logout. Please try again."
+                                "message": message
+                            })
+                            
+                    elif command == "login":
+                        player_id, message = verify_player(name, password_hash)
+                        if player_id:
+                            player = load_player(player_id)
+                            await websocket.send_json({
+                                "type": "auth_success",
+                                "message": f"Welcome back, {player['name_original']}!\n\nType 'look' to see where you are."
+                            })
+                        else:
+                            await websocket.send_json({
+                                "type": "error",
+                                "message": message
                             })
                     
-                    # Normal message handling
-                    else:
+                    if not player:
+                        continue
+
+                    # Add to connected clients
+                    connected_clients[player_id] = websocket
+
+                # Handle normal game commands
+                else:
+                    try:
+                        response = game_logic.handle_action(player, message)
+                        
+                        # Handle special responses
+                        if isinstance(response, dict):
+                            if response["type"] == "kick":
+                                target_websocket = connected_clients.get(response["target_id"])
+                                if target_websocket:
+                                    await target_websocket.send_json({
+                                        "type": "error",
+                                        "message": f"You have been kicked by {player['name_original']}"
+                                    })
+                                    await target_websocket.close(code=1000, reason="Kicked by moderator")
+                                await websocket.send_json({
+                                    "type": "game_message",
+                                    "message": response["message"]
+                                })
+                                continue
+                        
+                        # Normal message handling
                         await websocket.send_json({
                             "type": "game_message",
                             "message": response
                         })
-                except Exception as e:
-                    await websocket.send_json({
-                        "type": "error",
-                        "message": str(e)
-                    })
+                    except Exception as e:
+                        await websocket.send_json({
+                            "type": "error",
+                            "message": str(e)
+                        })
 
+            except WebSocketDisconnect:
+                break
+            except Exception as e:
+                print(f"Error handling message: {e}")
+                await websocket.send_json({
+                    "type": "error",
+                    "message": "An error occurred processing your request"
+                })
+                
     except WebSocketDisconnect:
-        if player:
-            del connected_clients[player['id']]
-        if client_id in rate_limits:
-            del rate_limits[client_id]
-        print(f"Client {player['id'] if player else 'unknown'} disconnected")
+        print(f"Client {client_id} disconnected")
+    except Exception as e:
+        print(f"Error in websocket connection: {e}")
     finally:
-        if player:
-            save_player(player['id'], player)
+        if player and player["id"] in connected_clients:
+            del connected_clients[player["id"]]
+        print(f"Connection closed for client {client_id}")
 
 if __name__ == "__main__":
     import uvicorn

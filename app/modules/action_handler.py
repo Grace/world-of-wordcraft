@@ -1,7 +1,8 @@
-from app.database import check_permission, save_room, update_player_location, get_room, get_players_in_room
+from app.database import check_permission, save_room, update_player_location, get_room, get_players_in_room, load_player
 
 class ActionHandler:
-    def __init__(self):
+    def __init__(self, connected_clients=None):
+        self.connected_clients = connected_clients
         self.direction_mapping = {
             "n": "north", "s": "south", "e": "east", "w": "west",
             "u": "up", "d": "down",
@@ -205,7 +206,20 @@ class ActionHandler:
         parts = action.split()
         if len(parts) < 2:
             return "Usage: kick <player_name>"
-        return f"Kicked player {parts[1]}"
+            
+        target_name = parts[1].lower()
+        
+        # Find target player
+        for player_id, websocket in self.connected_clients.items():
+            target = load_player(player_id)
+            if target and target["name"].lower() == target_name:
+                return {
+                    "type": "kick",
+                    "target_id": player_id,
+                    "message": f"Player {target['name_original']} has been kicked by {player['name_original']}"
+                }
+                    
+        return f"Player {parts[1]} not found or not online."
         
     def _handle_mute(self, player, action, room):
         """Mute a player (mod+ only)."""

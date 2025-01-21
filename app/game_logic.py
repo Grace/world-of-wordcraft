@@ -1,15 +1,15 @@
 from dotenv import load_dotenv
-import os
 from .modules.room_generator import RoomGenerator
 from .modules.action_handler import ActionHandler
 from .modules.game_state import GameState
+import os
 
 load_dotenv()
 
 class GameLogic:
-    def __init__(self):
+    def __init__(self, connected_clients):
         self.room_generator = RoomGenerator(os.getenv('OPENAI_API_KEY'))
-        self.action_handler = ActionHandler()
+        self.action_handler = ActionHandler(connected_clients)
         self.game_state = GameState()
 
     def handle_action(self, player, action):
@@ -22,6 +22,3 @@ class GameLogic:
             self.game_state.save_room(location, room)
 
         return self.action_handler.handle(player, action, room)
-
-# Create singleton instance
-game_logic = GameLogic()
