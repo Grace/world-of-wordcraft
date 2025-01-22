@@ -170,5 +170,9 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
+# Virtual python environment folders
+pyenv/
+myenv/
+
 game.db
 .aider*

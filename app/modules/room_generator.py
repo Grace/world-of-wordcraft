@@ -12,7 +12,7 @@ class RoomGenerator:
         Required elements:
         1. DESCRIPTION: Write a vivid, screen-reader friendly description (2-3 sentences).
         2. EXITS: Include 2-3 logical exits (north/south/east/west/up/down).
-        3. INTERACTIVITY: One puzzle or challenge.
+        3. INTERACTIVITY: 0-1 puzzle or challenge.
         """
 
     def generate_room(self, coordinates, previous_room=None):

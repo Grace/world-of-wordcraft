@@ -19,8 +19,9 @@ Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! T
 
 ## Deployment
 1. Clone the repository.
-2. Set up a Railway project and add your `OPENAI_API_KEY` to environment variables.
-3. Create a `JWT_SECRET_KEY` (ask ChatGPT to generate one if you don't know how) and add it to environment variables.
+2. Create .env file in the root folder of the project
+2. Set up a Railway project and add your `OPENAI_API_KEY` to the .env file.
+3. Create a `JWT_SECRET_KEY` (ask ChatGPT to generate one if you don't know how) and add it to the .env file.
 4. Run `railway up` to deploy.
 
 ## Local Development
