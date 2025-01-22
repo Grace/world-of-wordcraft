@@ -28,6 +28,15 @@ Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! T
 2. Run the server: `python -m app.server.py`.
 3. Connect to `ws://localhost:5001` using a WebSocket client like `wscat` or point your browser to `localhost:5001`.
 
+## 🤝 Contributing
+
+Contributions encouraged! Whether it's fixing a bug, improving gameplay mechanics, or adding new features, your help is appreciated. 
+
+To contribute:
+1. Fork the repository.
+2. Create a new branch for your feature or fix.
+3. Submit a pull request with a clear description of your changes.
+
 ## Extra Goals
 - [ ] **Build a Core Game Engine**: Develop a robust game engine to streamline the implementation of all other features and improve maintainability.  
 - [ ] **Enhanced Room Generation**: Ensure room generation dynamically accounts for exits in connected rooms, creating a more cohesive world.  
