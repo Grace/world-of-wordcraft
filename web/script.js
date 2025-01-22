@@ -12,7 +12,58 @@ const wsUrl =
     : `ws://${window.location.host}/ws`;
 
 console.log(`Connecting to WebSocket server at: ${wsUrl}`);
-const ws = new WebSocket(wsUrl);
+
+// Initialize WebSocket connection
+let ws;
+function connectWebSocket() {
+    ws = new WebSocket(wsUrl);
+    
+    ws.onopen = () => {
+        console.log("WebSocket connection established");
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+            ws.send(JSON.stringify({
+                type: 'token_auth',
+                token: token
+            }));
+        }
+    };
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        
+        switch(data.type) {
+            case "auth_success":
+                if (data.token) {
+                    localStorage.setItem('auth_token', data.token);
+                }
+                appendToOutput(data.message);
+                break;
+                
+            case "logout":
+                localStorage.removeItem('auth_token');
+                appendToOutput("Logged out successfully");
+                break;
+                
+            case "error":
+                appendToOutput(`Error: ${data.message}`);
+                if (data.message.includes("banned")) {
+                    localStorage.removeItem('auth_token');
+                }
+                break;
+                
+            default:
+                appendToOutput(data.message);
+        }
+    };
+
+    ws.onclose = () => {
+        console.log("WebSocket connection closed");
+        setTimeout(connectWebSocket, 1000);
+    };
+}
+
+connectWebSocket();
 
 function scrollToBottom() {
     const lastMessage = output.lastElementChild;
@@ -59,58 +110,6 @@ const scrollObserver = new IntersectionObserver((entries) => {
     root: output,
     threshold: 1.0
 });
-
-// Handle WebSocket events
-ws.onopen = () => {
-    console.log("WebSocket connection established.");
-    appendToOutput("Connected to the server.");
-};
-
-ws.onerror = (error) => {
-    console.error("WebSocket error:", error);
-    appendToOutput("Connection error. Please try again.");
-};
-
-ws.onmessage = (event) => {
-    try {
-        const data = JSON.parse(event.data);
-        
-        switch(data.type) {
-            case "auth_request":
-            case "auth_success":
-            case "game_message":
-                appendToOutput(data.message);
-                break;
-            case "theme":
-                document.documentElement.setAttribute('data-theme', data.theme);
-                localStorage.setItem('theme', data.theme);
-                appendToOutput(data.message);
-                break;
-            case "error":
-                appendToOutput(`Error: ${data.message}`);
-                break;
-            case "fontsize":
-                output.style.fontSize = `${data.size}px`;
-                localStorage.setItem('fontSize', data.size);
-                appendToOutput(data.message);
-                break;
-        }
-        
-        // Observe the last message for visibility
-        const lastMessage = output.lastElementChild;
-        if (lastMessage) {
-            scrollObserver.observe(lastMessage);
-        }
-    } catch (error) {
-        console.error("Failed to parse message:", error);
-        appendToOutput("Error: Failed to parse server message");
-    }
-};
-
-ws.onclose = () => {
-    console.log("WebSocket connection closed.");
-    appendToOutput("Disconnected from the server.");
-};
 
 // Initialize theme from localStorage - default to high-contrast
 const savedTheme = localStorage.getItem('theme') || 'high-contrast';

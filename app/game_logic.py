@@ -14,11 +14,22 @@ class GameLogic:
 
     def handle_action(self, player, action):
         """Handle a player's action and return the result."""
-        location = player["location"]
-        room = self.game_state.get_room(location)
-        
-        if not room:
-            room = self.room_generator.generate_room(location)
-            self.game_state.save_room(location, room)
+        try:
+            location = player["location"]
+            room = self.game_state.get_room(location)
+            
+            if not room:
+                room = self.room_generator.generate_room(location)
+                self.game_state.save_room(location, room)
 
-        return self.action_handler.handle(player, action, room)
+            result = self.action_handler.handle(player, action, room)
+            return {
+                "type": "message",
+                "message": result
+            }
+        except Exception as e:
+            print(f"Error in game logic: {str(e)}")
+            return {
+                "type": "error",
+                "message": "Error processing action"
+            }
