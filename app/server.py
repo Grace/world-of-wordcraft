@@ -212,13 +212,11 @@ async def websocket_endpoint(websocket: WebSocket):
     player = None
     client_id = f"{websocket.client.host}:{websocket.client.port}"
     
-    try:
+    try:    
         while True:
             try:
-                # Receive raw message
                 raw_message = await websocket.receive_text()
                 
-                # Try to parse as JSON, fallback to text command
                 try:
                     data = json.loads(raw_message)
                 except json.JSONDecodeError:
@@ -226,50 +224,50 @@ async def websocket_endpoint(websocket: WebSocket):
                 
                 print(f"Debug: Received message: {data}")
                 
-                # Handle token authentication
                 if data.get("type") == "token_auth":
                     player_id = verify_token(data.get("token"))
+                    
+                    # If auth token is valid, load the player
                     if player_id:
                         player = load_player(player_id)
+                        # Check if player exists and is not banned
                         if player:
                             if is_banned(player["id"]):
-                                await handle_banned_player(player["id"], websocket)
+                                await websocket.send_json({
+                                    "type": "error",
+                                    "message": "Account is banned"
+                                })
                                 return
-                            
+                                
                             connected_clients[player["id"]] = websocket
                             await websocket.send_json({
                                 "type": "auth_success",
                                 "token": create_token(player["id"]),
-                                "message": f"Welcome back, {player['name_original']}!"
+                                "message": f"Welcome back, {player['name_original']}! Type 'look' to see where you are."
                             })
-                    continue
-                
-                # Handle commands for authenticated players
-                if player:
-                    if not check_rate_limit(client_id):
+                            continue
+                        
+                    # If no auth token found, prompt player with register or login message    
+                    if not player_id:
+                        # Send initial welcome/auth message
                         await websocket.send_json({
-                            "type": "error",
-                            "message": "You are sending messages too quickly!"
+                            "type": "auth_request",
+                            "message": REGISTER_OR_LOGIN_MESSAGE
                         })
                         continue
                     
-                    print(f"Debug: Processing command for {player['name_original']}")
+                # Handle commands for authenticated players
+                if player:
                     await process_player_command(player, data, websocket)
                     continue
                 
-                # Request authentication if not logged in
-                await websocket.send_json({
-                    "type": "auth_request",
-                    "message": REGISTER_OR_LOGIN_MESSAGE
-                })
-                
+                # Process login/register commands
+                await handle_auth_command(data, websocket)
+            
             except Exception as e:
-                print(f"Error in websocket connection: {str(e)}")
-                await websocket.send_json({
-                    "type": "error",
-                    "message": "An error occurred processing your request"
-                })
+                print(f"Error in processing command or player authentication: {str(e)}")
                 
+    # Handle websocket disconnect            
     except WebSocketDisconnect:
         if player and player["id"] in connected_clients:
             del connected_clients[player["id"]]
