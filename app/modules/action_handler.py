@@ -56,7 +56,7 @@ class ActionHandler:
         if action.startswith("highcontrast "):
             return self._handle_highcontrast(action)
         elif action == "logout":
-            return self._handle_logout(player)
+            return self._handle_logout(player)["message"]
         elif action in ["inventory", "i"]:
             return self._handle_inventory(player)
         elif action in self.direction_mapping:

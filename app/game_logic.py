@@ -7,9 +7,9 @@ import os
 load_dotenv()
 
 class GameLogic:
-    def __init__(self, connected_clients):
+    def __init__(self):
         self.room_generator = RoomGenerator(os.getenv('OPENAI_API_KEY'))
-        self.action_handler = ActionHandler(connected_clients)
+        self.action_handler = ActionHandler()
         self.game_state = GameState()
 
     def handle_action(self, player, action):

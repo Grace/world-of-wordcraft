@@ -5,10 +5,10 @@ from fastapi.responses import FileResponse
 from fastapi.security import APIKeyCookie
 from pathlib import Path
 from app.database import (
-    init_db, 
-    load_player, 
-    save_player, 
-    create_player, 
+    init_db,
+    load_player,
+    save_player,
+    create_player,
     verify_player,
     is_banned
 )
@@ -23,7 +23,6 @@ import os
 from dotenv import load_dotenv
 import jwt
 import json
-from starlette.websockets import WebSocketState
 
 load_dotenv()
 
@@ -51,11 +50,13 @@ fastapi_app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Serve the main HTML file at the root endpoint
 @fastapi_app.get("/")
 async def index():
     """Serve the main HTML file."""
     return FileResponse(WEB_DIR / "index.html")
+
 
 # Serve static files like JavaScript and CSS
 @fastapi_app.get("/{filename}")
@@ -66,11 +67,9 @@ async def static_files(filename: str):
         return FileResponse(file_path)
     return {"error": "File not found"}, 404
 
-# WebSocket connections
-connected_clients = {}
 
 # Create game logic instance
-game_logic = GameLogic(connected_clients)
+game_logic = GameLogic()
 
 # Rate limiting settings
 RATE_LIMIT = 5  # messages per second
@@ -125,6 +124,7 @@ Available accessibility commands:
 # Rate limiting storage
 rate_limits: Dict[str, list] = defaultdict(list)
 
+
 def sanitize_input(message: str) -> str:
     """Sanitize user input"""
     # Remove any non-alphanumeric chars except spaces and common punctuation
@@ -133,18 +133,20 @@ def sanitize_input(message: str) -> str:
     sanitized = html.escape(sanitized)
     return sanitized[:MESSAGE_SIZE_LIMIT]
 
+
 def check_rate_limit(client_id: str) -> bool:
     """Check if client has exceeded rate limit"""
     now = datetime.now()
     # Clean up old timestamps
-    rate_limits[client_id] = [t for t in rate_limits[client_id] 
-                             if (now - t).total_seconds() < RATE_WINDOW]
-    
+    rate_limits[client_id] = [t for t in rate_limits[client_id]
+                              if (now - t).total_seconds() < RATE_WINDOW]
+
     if len(rate_limits[client_id]) >= RATE_LIMIT:
         return False
-        
+
     rate_limits[client_id].append(now)
     return True
+
 
 def create_token(player_id: str) -> str:
     """Create JWT token for authenticated player"""
@@ -153,6 +155,7 @@ def create_token(player_id: str) -> str:
         "exp": datetime.now(timezone.utc) + TOKEN_EXPIRY
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
 
 def verify_token(token: str) -> str:
     """Verify JWT token and return player_id"""
@@ -168,9 +171,9 @@ async def process_player_command(player, data, websocket):
         # Get command content from either format
         command = data.get("content") if isinstance(data, dict) else data
         sanitized = sanitize_input(command)
-        
+
         print(f"Debug: Processing command '{sanitized}' for {player['name_original']}")
-        
+
         # Handle empty commands
         if not sanitized:
             await websocket.send_json({
@@ -178,26 +181,27 @@ async def process_player_command(player, data, websocket):
                 "message": "Please enter a command"
             })
             return
-            
+
         # Process command through game logic
         result = game_logic.handle_action(player, sanitized)
-        
+
         # Ensure result is JSON serializable
         if not isinstance(result, dict):
             result = {
                 "type": "message",
                 "message": str(result)
             }
-            
+
         print(f"Debug: Command result: {result}")
         await websocket.send_json(result)
-        
+
     except Exception as e:
         print(f"Error processing command: {str(e)}")
         await websocket.send_json({
             "type": "error",
             "message": "Error processing command"
         })
+
 
 async def handle_banned_player(player_id: str, websocket: WebSocket):
     """Handle a banned player"""
@@ -207,58 +211,69 @@ async def handle_banned_player(player_id: str, websocket: WebSocket):
     })
     await websocket.close()
 
-from fastapi import WebSocket, WebSocketDisconnect
-from typing import Dict
 
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: Dict[str, WebSocket] = {}
-        self.player_connections: Dict[str, str] = {}  # player_id -> client_id
+from .modules.connection_manager import ConnectionManager
 
-    async def connect(self, websocket: WebSocket, client_id: str):
-        await websocket.accept()
-        self.active_connections[client_id] = websocket
-
-    async def disconnect(self, client_id: str, player_id: str = None):
-        if client_id in self.active_connections:
-            ws = self.active_connections[client_id]
-            if ws.application_state != WebSocketState.DISCONNECTED:
-                await ws.close()
-            del self.active_connections[client_id]
-        if player_id:
-            if player_id in connected_clients:
-                del connected_clients[player_id]
-            if player_id in self.player_connections:
-                del self.player_connections[player_id]
-
-    async def send_message(self, client_id: str, message: dict):
-        if client_id in self.active_connections:
-            try:
-                await self.active_connections[client_id].send_json(message)
-            except WebSocketDisconnect:
-                await self.disconnect(client_id)
-
+# Initialize manager
 manager = ConnectionManager()
 
-async def send_login_or_register_message(websocket: WebSocket):
-    """Send login or register message to client"""
-    message = {
-        "type": "message",
-        "message": REGISTER_OR_LOGIN_MESSAGE
-    }
-    websocket.send_json(message)
+async def handle_auth_command(data, client_id, websocket):
+    command = data.get("content")
+    if command.startswith("login"):
+        _, name, password = command.split()
+        player = verify_player(name, password)
+        if player:
+            token = create_token(player["id"])
+            await manager.send_message(client_id, {
+                "type": "auth_success",
+                "token": token,
+                "message": f"Welcome, {player['name_original']}!"
+            })
+            manager.add_connected_client(player["id"], websocket)
+            manager.add_connected_player(player["id"])
+        else:
+            await manager.send_message(client_id, {
+                "type": "auth_failure",
+                "message": "Invalid login credentials"
+            })
+    elif command.startswith("register"):
+        _, name, password = command.split()
+        player = create_player(name, password)
+        if player:
+            token = create_token(player["id"])
+            await manager.send_message(client_id, {
+                "type": "auth_success",
+                "token": token,
+                "message": f"Account created for {player['name_original']}!"
+            })
+            manager.add_connected_client(player["id"], websocket)
+            manager.add_connected_player(player["id"])
+        else:
+            await manager.send_message(client_id, {
+                "type": "auth_failure",
+                "message": "Registration failed"
+            })
+    else:
+        await manager.send_message(client_id, {
+            "type": "error",
+            "message": "Unknown authentication command"
+        })
+
 
 @fastapi_app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     client_id = f"{websocket.client.host}:{websocket.client.port}"
     player = None
-    
+
     try:
         await manager.connect(websocket, client_id)
-        
+
         # Send initial welcome message
-        send_login_or_register_message(websocket)
-        
+        await manager.send_message(client_id, {
+            "type": "auth_request",
+            "message": REGISTER_OR_LOGIN_MESSAGE
+        })
+
         while True:
             try:
                 raw_message = await websocket.receive_text()
@@ -268,37 +283,52 @@ async def websocket_endpoint(websocket: WebSocket):
             except WebSocketDisconnect:
                 await manager.disconnect(client_id, player["id"] if player else None)
                 break
-                
+
             try:
                 if data.get("type") == "token_auth":
                     player_id = verify_token(data.get("token"))
                     if player_id:
                         player = load_player(player_id)
                         if player:
-                            manager.player_connections[player["id"]] = client_id
-                            connected_clients[player["id"]] = websocket
+                            manager.add_connected_client(player["id"], websocket)
+                            manager.add_connected_player(player["id"])
                             await manager.send_message(client_id, {
                                 "type": "auth_success",
                                 "token": create_token(player["id"]),
-                                "message": f"Welcome back, {player['name_original']}! Type 'look' to see where you are."
+                                "message": f"Welcome back, {player['name_original']}!"
                             })
                             continue
-                
+
+                        # If no player_id with a verified auth token found, prompt player with register or login message
+                        if not player_id:
+                            # Send initial welcome/auth message
+                            await websocket.send_json({
+                                "type": "auth_request",
+                                "message": REGISTER_OR_LOGIN_MESSAGE
+                            })
+                            continue
+
                 if player:
-                    await process_player_command(player, data, websocket)
+                    result = await process_player_command(player, data, websocket)
+                    await manager.send_message(client_id, result)
                     continue
-                    
-                await handle_auth_command(data, websocket)
-                
+
+                # Handle authentication
+                await handle_auth_command(data, client_id)
+
             except Exception as e:
                 print(f"Error processing message: {str(e)}")
-                continue
-                
+                await manager.send_message(client_id, {
+                    "type": "error",
+                    "message": "Error processing command"
+                })
+
     except Exception as e:
         print(f"WebSocket error: {str(e)}")
-        
+
     finally:
         await manager.disconnect(client_id, player["id"] if player else None)
+
 
 if __name__ == "__main__":
     import uvicorn
