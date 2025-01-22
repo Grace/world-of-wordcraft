@@ -10,12 +10,12 @@ Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! T
 - For the best experience, use a modern browser with WebSocket support enabled.
 
 ## Features  
-- **Text-to-Speech Accessibility**: Activate with the `speech on` command to narrate game events, offering a hands-free, immersive experience. Replay recent updates with the `speech repeat` command.  
-- **Dynamic Room Generation**: Immersive environments crafted with OpenAI, with an evolving game engine to add structure to the creative chaos of AI-generated content.  
-- **Hierarchical Role System**: Player roles include regular players, moderators, and admins, each with distinct permissions.  
+- **Text-to-Speech Accessibility**: Activate with the `speech on` command to narrate game events, offering a more immersive and accessible experience. Replay recent updates with the `speech repeat` command.
+- **Dynamic Room Generation**: Dynamic environments crafted with OpenAI, with an evolving game engine to add structure to the creative chaos of AI-generated content.
 - **Real-Time Player Chat**: Engage with other players using a robust in-game chat system.  
 - **Interactive NPCs**: Encounter non-player characters with dialogue options and tradeable items to enhance gameplay.
 - **Inventory and Trading**: Manage your items and trade seamlessly with other players.
+- **Hierarchical Role System**: Player roles include regular players, moderators, and admins, each with distinct permissions.
 
 ## Deployment
 1. Clone the repository.
@@ -32,7 +32,7 @@ Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! T
 
 ## 🤝 Contributing
 
-Contributions encouraged! Whether it's fixing a bug, improving gameplay mechanics, or adding new features, your help is appreciated. 
+Contributions encouraged! Whether it's fixing a bug, improving gameplay mechanics, or adding new features, your help is appreciated.
 
 To contribute:
 1. Fork the repository.
@@ -55,7 +55,6 @@ To contribute:
 - [ ] **Scalable Database Support**: Add support for scalable SQL and/or NoSQL database(s)
 - [ ] **Unit and Integration Testing**: Set up comprehensive unit and integration tests to ensure stability and reliability.  
 - [ ] **Development Build/Deployment**: Establish a robust build and deployment pipeline to streamline development and testing.  
-
 
 ## Disclaimer
 This project, **World of Wordcraft**, is an independent, open-source text-based game developed as an experimental exploration of AI's role in generating interactive textual game content. It is not affiliated with, endorsed by, or associated with Blizzard Entertainment or any other entity that holds trademarks or intellectual property rights for similarly named or related works. The use of the name is intended as a lighthearted pun and is not intended to cause confusion or infringe upon any existing trademarks or intellectual property.
