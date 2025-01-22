@@ -23,6 +23,7 @@ import os
 from dotenv import load_dotenv
 import jwt
 import json
+from starlette.websockets import WebSocketState
 
 load_dotenv()
 
@@ -206,77 +207,98 @@ async def handle_banned_player(player_id: str, websocket: WebSocket):
     })
     await websocket.close()
 
+from fastapi import WebSocket, WebSocketDisconnect
+from typing import Dict
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: Dict[str, WebSocket] = {}
+        self.player_connections: Dict[str, str] = {}  # player_id -> client_id
+
+    async def connect(self, websocket: WebSocket, client_id: str):
+        await websocket.accept()
+        self.active_connections[client_id] = websocket
+
+    async def disconnect(self, client_id: str, player_id: str = None):
+        if client_id in self.active_connections:
+            ws = self.active_connections[client_id]
+            if ws.application_state != WebSocketState.DISCONNECTED:
+                await ws.close()
+            del self.active_connections[client_id]
+        if player_id:
+            if player_id in connected_clients:
+                del connected_clients[player_id]
+            if player_id in self.player_connections:
+                del self.player_connections[player_id]
+
+    async def send_message(self, client_id: str, message: dict):
+        if client_id in self.active_connections:
+            try:
+                await self.active_connections[client_id].send_json(message)
+            except WebSocketDisconnect:
+                await self.disconnect(client_id)
+
+manager = ConnectionManager()
+
+async def send_login_or_register_message(websocket: WebSocket):
+    """Send login or register message to client"""
+    message = {
+        "type": "message",
+        "message": REGISTER_OR_LOGIN_MESSAGE
+    }
+    websocket.send_json(message)
+
 @fastapi_app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    player = None
     client_id = f"{websocket.client.host}:{websocket.client.port}"
+    player = None
     
-    try:    
+    try:
+        await manager.connect(websocket, client_id)
+        
+        # Send initial welcome message
+        send_login_or_register_message(websocket)
+        
         while True:
             try:
                 raw_message = await websocket.receive_text()
+                data = json.loads(raw_message)
+            except json.JSONDecodeError:
+                data = {"type": "command", "content": raw_message}
+            except WebSocketDisconnect:
+                await manager.disconnect(client_id, player["id"] if player else None)
+                break
                 
-                try:
-                    data = json.loads(raw_message)
-                except json.JSONDecodeError:
-                    data = {"type": "command", "content": raw_message}
-                
-                print(f"Debug: Received message: {data}")
-                
+            try:
                 if data.get("type") == "token_auth":
                     player_id = verify_token(data.get("token"))
-                    
-                    # If auth token is valid, load the player
                     if player_id:
                         player = load_player(player_id)
-                        # Check if player exists and is not banned
                         if player:
-                            if is_banned(player["id"]):
-                                await websocket.send_json({
-                                    "type": "error",
-                                    "message": "Account is banned"
-                                })
-                                return
-                                
+                            manager.player_connections[player["id"]] = client_id
                             connected_clients[player["id"]] = websocket
-                            await websocket.send_json({
+                            await manager.send_message(client_id, {
                                 "type": "auth_success",
                                 "token": create_token(player["id"]),
                                 "message": f"Welcome back, {player['name_original']}! Type 'look' to see where you are."
                             })
                             continue
-                        
-                    # If no auth token found, prompt player with register or login message    
-                    if not player_id:
-                        # Send initial welcome/auth message
-                        await websocket.send_json({
-                            "type": "auth_request",
-                            "message": REGISTER_OR_LOGIN_MESSAGE
-                        })
-                        continue
-                    
-                # Handle commands for authenticated players
+                
                 if player:
                     await process_player_command(player, data, websocket)
                     continue
-                
-                # Process login/register commands
+                    
                 await handle_auth_command(data, websocket)
-            
-            except Exception as e:
-                print(f"Error in processing command or player authentication: {str(e)}")
                 
-    # Handle websocket disconnect            
-    except WebSocketDisconnect:
-        if player and player["id"] in connected_clients:
-            del connected_clients[player["id"]]
+            except Exception as e:
+                print(f"Error processing message: {str(e)}")
+                continue
+                
     except Exception as e:
-        print(f"Error in websocket connection: {e}")
+        print(f"WebSocket error: {str(e)}")
+        
     finally:
-        if player and player["id"] in connected_clients:
-            del connected_clients[player["id"]]
-        print(f"Connection closed for client {client_id}")
+        await manager.disconnect(client_id, player["id"] if player else None)
 
 if __name__ == "__main__":
     import uvicorn
