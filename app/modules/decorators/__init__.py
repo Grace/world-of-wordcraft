@@ -1,6 +1,6 @@
 from functools import wraps
 from typing import List
-from .roles import Role
+from ..roles import Role
 
 def required_roles(roles: List[Role]):
     def decorator(func):

@@ -1,6 +1,6 @@
 from typing import Dict, Any, Set, Optional
 import logging
-from ..commands.roles import Role
+from ...modules.roles import Role
 
 logger = logging.getLogger(__name__)
 
