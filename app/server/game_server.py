@@ -1,16 +1,11 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException
+from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pathlib import Path
-import hashlib
-import re
-import logging
 
-from .modules.network.websocket_manager import WebSocketManager
-from .config import Settings
-from .logging_config import setup_logging
-from .modules.database.sqlite_handler import SQLiteHandler
-from fastapi.staticfiles import StaticFiles
+from ..modules.network.websocket_manager import WebSocketManager
+from ..config.settings import Settings
+from ..config.logging_config import setup_logging
+from ..modules.database.sqlite_handler import SQLiteHandler
 from contextlib import asynccontextmanager
 from typing import Optional
 
