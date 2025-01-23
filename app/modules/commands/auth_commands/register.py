@@ -2,7 +2,6 @@ from ..command import Command
 from ...database.sqlite_handler import SQLiteHandler
 from ...network.websocket_message import WebSocketMessage
 from ...network.session_manager import SessionManager
-import re
 import logging
 
 logger = logging.getLogger(__name__)
