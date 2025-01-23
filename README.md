@@ -1,6 +1,6 @@
 # World of Wordcraft
 
-<img width="1222" alt="image" src="https://github.com/user-attachments/assets/1f1422bf-13b0-42d2-baa1-75534747ff03" />
+<img width="1222" alt="image" src="https://github.com/user-attachments/assets/c2f3576a-0baf-41ca-972d-4446af1453f5" />
 
 ## Game Demo  
 [Play the Game in Your Browser](https://world-of-wordcraft.up.railway.app/)  
