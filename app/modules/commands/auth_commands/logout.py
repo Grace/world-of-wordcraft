@@ -1,27 +1,21 @@
 from ..command import Command
+from ..roles import Role
 from ...network.websocket_message import WebSocketMessage
+from ...network.session_manager import SessionManager
+from ..decorators import required_roles
 from ...constants import WELCOME_MESSAGE
 import logging
 
 logger = logging.getLogger(__name__)
 
 class LogoutCommand(Command):
-    def __init__(self):
-        super().__init__(
-            name="logout",
-            description="Logout from your current session"
-        )
+    name = "logout"
+    description = "Logout from your current session"
+    requires_login = True
 
-    async def execute(self, args: str = "") -> WebSocketMessage:
-        logger.info("Player logging out")
-        
-        # Return welcome message with login instructions
-        logout_message = (
-            "You have been logged out.\n\n" +
-            WELCOME_MESSAGE
-        )
-        
+    async def execute(self, args: str, client_id: str, session_manager: SessionManager) -> WebSocketMessage:
+        session_manager.end_session(client_id)
         return WebSocketMessage(
             type='logout',
-            message=logout_message
+            message='You have been logged out.\n\n' + WELCOME_MESSAGE
         )
