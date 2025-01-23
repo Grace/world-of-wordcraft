@@ -96,6 +96,3 @@ class GameServer:
             port=Settings.PORT,
             log_level="info"
         )
-
-if __name__ == "__main__":
-    GameServer.start()

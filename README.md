@@ -20,14 +20,13 @@ Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! T
 ## Deployment
 1. Clone the repository.
 2. Create .env file in the root folder of the project
-2. Set up a Railway project and add your `OPENAI_API_KEY` to the .env file.
-3. Create a `JWT_SECRET_KEY` (ask ChatGPT to generate one if you don't know how) and add it to the .env file.
+3. Set up a Railway project and add your `OPENAI_API_KEY` to the .env file.
 4. Run `railway up` to deploy.
 
 ## Local Development
 1. Install dependencies: `pip install -r requirements.txt`.
-2. Add `OPENAI_API_KEY=<your OPENAI API key>`, `JWT_SECRET_KEY=<your secret JWT key>`, and `ENVIRONMENT=development` to a .env file in the root folder.
-3. Run the server: `python -m app.server`.
+2. Add `OPENAI_API_KEY=<your OPENAI API key>` and `ENVIRONMENT=development` to a .env file in the root folder.
+3. Run the server: `python -m app.main`.
 4. Connect to `ws://localhost:5001` using a WebSocket client like `wscat` or point your browser to `localhost:5001`.
 
 ## 🤝 Contributing
