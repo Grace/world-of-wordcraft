@@ -3,7 +3,7 @@
     "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "startCommand": "python -m app.server",
+    "startCommand": "python -m app.main",
     "exposedPorts": [5001]
   }
 }
