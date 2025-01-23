@@ -11,6 +11,8 @@ Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! T
 - If you encounter disconnections or errors, simply refresh the page and try again after a minute. The app may go into sleep mode during periods of low traffic to conserve resources.  
 - For the best experience, use a modern browser with WebSocket support enabled.
 
+---
+
 ## Features  
 - **Text-to-Speech Accessibility**: Activate with the `speech on` command to narrate game events, offering a more immersive and accessible experience. Replay recent updates with the `speech repeat` command.
 - **Dynamic Room Generation**: Dynamic environments crafted with OpenAI, with an evolving game engine to add structure to the creative chaos of AI-generated content.
@@ -19,11 +21,15 @@ Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! T
 - **Inventory and Trading**: Manage your items and trade seamlessly with other players.
 - **Hierarchical Role System**: Player roles include regular players, moderators, and admins, each with distinct permissions.
 
+---
+
 ## Deployment
 1. Clone the repository.
 2. Create .env file in the root folder of the project
 3. Set up a Railway project and add your `OPENAI_API_KEY` to the .env file.
 4. Run `railway up` to deploy.
+
+---
 
 ## Local Development
 1. Install dependencies: `pip install -r requirements.txt`.
@@ -38,6 +44,8 @@ ENVIRONMENT=development
 LOG_LEVEL=INFO
 ```
 
+---
+
 ## 🤝 Contributing
 
 Contributions encouraged! Whether it's fixing a bug, improving gameplay mechanics, or adding new features, your help is appreciated.
@@ -47,9 +55,11 @@ To contribute:
 2. Create a new branch for your feature or fix.
 3. Submit a pull request with a clear description of your changes.
 
+---
+
 ## Future Goals
 - [ ] **Build a Core Game Engine**: Develop a robust game engine to streamline the implementation of all other features and improve maintainability.  
-- [ ] **Enhanced Room Generation**: Ensure room generation dynamically accounts for exits in connected rooms, creating a more cohesive world.  
+- [ ] **Enhanced Room Generation**: Transform natural language descriptions of procedurally generated text into structured entities that represent rooms, NPCs, and items.
 - [x] **Help Command**: Add a `help` command to provide detailed guidance on all available commands.  
 - [x] **Roles and Privileges**: Implement hierarchical roles such as moderators and admins, each with varying levels of permissions.  
 - [ ] **Editable World Elements**: Allow moderators and admins to modify rooms, NPCs, items, and interactions in-game.  
