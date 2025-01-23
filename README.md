@@ -62,6 +62,7 @@ To contribute:
 - [ ] **Unit and Integration Testing**: Set up comprehensive unit and integration tests to ensure stability and reliability.  
 - [ ] **Development Build/Deployment**: Establish a robust build and deployment pipeline to streamline development and testing.  
 - [ ] **Super Big Font**: Enable horizontal scrolling to accommodate players who benefit from larger font sizes
+- [ ] **Text-to-speech Customization**: Add user controls to adjust how far back the built-in text-to-speech repeats from output history.
 
 ## Disclaimer
 This project, **World of Wordcraft**, is an independent, open-source text-based game developed as an experimental exploration of AI's role in generating interactive textual game content. It is not affiliated with, endorsed by, or associated with Blizzard Entertainment or any other entity that holds trademarks or intellectual property rights for similarly named or related works. The use of the name is intended as a lighthearted pun and is not intended to cause confusion or infringe upon any existing trademarks or intellectual property.

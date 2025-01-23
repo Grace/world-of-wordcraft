@@ -10,6 +10,10 @@ from .auth_commands.register import RegisterCommand
 from .help_command import HelpCommand
 from .accessibility_commands.highcontrast_command import HighContrastCommand
 from .accessibility_commands.fontsize_command import FontSizeCommand
+from .accessibility_commands.speech_command import SpeechCommand
+from .accessibility_commands.speech_rate_command import SpeechRateCommand
+from .accessibility_commands.speech_repeat_command import SpeechRepeatCommand
+from .accessibility_commands.speech_stop_command import SpeechStopCommand
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +41,11 @@ class CommandRegistry:
             'register': RegisterCommand,
             'look': LookCommand,
             'highcontrast': HighContrastCommand,
-            'fontsize': FontSizeCommand  # Add this line
+            'fontsize': FontSizeCommand,
+            'speech': SpeechCommand,
+            'speech-rate': SpeechRateCommand,
+            'speech-repeat': SpeechRepeatCommand,
+            'speech-stop': SpeechStopCommand
         }
 
         for cmd_name, cmd_class in command_classes.items():

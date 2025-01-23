@@ -8,4 +8,5 @@ Available accessibility commands:
 - fontsize <number>
 - speech on/off
 - speech rate <0.1-10>
-- speech repeat"""
+- speech repeat
+- speech stop"""
