@@ -1,9 +1,12 @@
 # World of Wordcraft
 
+<img width="1222" alt="image" src="https://github.com/user-attachments/assets/1f1422bf-13b0-42d2-baa1-75534747ff03" />
+
 ## Game Demo  
 [Play the Game in Your Browser](https://world-of-wordcraft.up.railway.app/)  
 
 Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! This open-source project allows players to explore a procedurally generated world of words and interact in real time.
+
 
 **Note:**  
 - If you encounter disconnections or errors, simply refresh the page and try again after a minute. The app may go into sleep mode during periods of low traffic to conserve resources.  
