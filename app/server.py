@@ -1,19 +1,11 @@
-import os
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from fastapi.security import APIKeyCookie
 from pathlib import Path
 import hashlib
-from datetime import datetime, timedelta, timezone
 import re
-from typing import Dict
-from collections import defaultdict
-import html
-from dotenv import load_dotenv
-import jwt
-import json
 import logging
+
 from .modules.network.websocket_manager import WebSocketManager
 from .config import Settings
 from .logging_config import setup_logging
