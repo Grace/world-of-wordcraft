@@ -59,7 +59,7 @@ To contribute:
 
 ## Future Goals
 - [ ] **Build a Core Game Engine**: Develop a robust game engine to streamline the implementation of all other features and improve maintainability.  
-- [ ] **Enhanced Room Generation**: Use natural language processing (NLP) to parse procedurally generated room descriptions and identify entities.
+- [ ] **Enhanced Room Generation**: Use natural language processing (NLP) to parse procedurally generated room descriptions and identify game entities.
 - [x] **Help Command**: Add a `help` command to provide detailed guidance on all available commands.  
 - [x] **Roles and Privileges**: Implement hierarchical roles such as moderators and admins, each with varying levels of permissions.  
 - [ ] **Editable World Elements**: Allow moderators and admins to modify rooms, NPCs, items, and interactions in-game.  
