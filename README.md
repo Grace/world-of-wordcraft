@@ -48,7 +48,7 @@ To contribute:
 ## Extra Goals
 - [ ] **Build a Core Game Engine**: Develop a robust game engine to streamline the implementation of all other features and improve maintainability.  
 - [ ] **Enhanced Room Generation**: Ensure room generation dynamically accounts for exits in connected rooms, creating a more cohesive world.  
-- [ ] **Help Command**: Add a `help` command to provide detailed guidance on all available commands.  
+- [x] **Help Command**: Add a `help` command to provide detailed guidance on all available commands.  
 - [x] **Roles and Privileges**: Implement hierarchical roles such as moderators and admins, each with varying levels of permissions.  
 - [ ] **Editable World Elements**: Allow moderators and admins to modify rooms, NPCs, items, and interactions in-game.  
 - [x] **Player Chat System**: Introduce versatile player communication commands (`say`, `yell`, `tell`) for real-time interaction.  
@@ -61,6 +61,7 @@ To contribute:
 - [ ] **Scalable Database Support**: Add support for scalable SQL and/or NoSQL database(s)
 - [ ] **Unit and Integration Testing**: Set up comprehensive unit and integration tests to ensure stability and reliability.  
 - [ ] **Development Build/Deployment**: Establish a robust build and deployment pipeline to streamline development and testing.  
+- [ ] **Super Big Font**: Enable horizontal scrolling to accommodate players who benefit from larger font sizes
 
 ## Disclaimer
 This project, **World of Wordcraft**, is an independent, open-source text-based game developed as an experimental exploration of AI's role in generating interactive textual game content. It is not affiliated with, endorsed by, or associated with Blizzard Entertainment or any other entity that holds trademarks or intellectual property rights for similarly named or related works. The use of the name is intended as a lighthearted pun and is not intended to cause confusion or infringe upon any existing trademarks or intellectual property.

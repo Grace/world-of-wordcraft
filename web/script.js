@@ -35,6 +35,12 @@ function connectWebSocket() {
                 localStorage.setItem('theme', data.data.theme);
             }
             
+            // Handle font size changes
+            if (data.type === 'fontsize' && data.data?.fontSize) {
+                output.style.fontSize = `${data.data.fontSize}px`;
+                localStorage.setItem('fontSize', data.data.fontSize);
+            }
+            
             appendToOutput(data.message);
         } catch (e) {
             console.error('Failed to parse message:', e);

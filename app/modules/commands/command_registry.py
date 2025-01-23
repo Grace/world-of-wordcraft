@@ -9,6 +9,7 @@ from .auth_commands.logout import LogoutCommand
 from .auth_commands.register import RegisterCommand
 from .help_command import HelpCommand
 from .accessibility_commands.highcontrast_command import HighContrastCommand
+from .accessibility_commands.fontsize_command import FontSizeCommand
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,8 @@ class CommandRegistry:
             'logout': LogoutCommand,
             'register': RegisterCommand,
             'look': LookCommand,
-            'highcontrast': HighContrastCommand
+            'highcontrast': HighContrastCommand,
+            'fontsize': FontSizeCommand  # Add this line
         }
 
         for cmd_name, cmd_class in command_classes.items():
