@@ -79,3 +79,5 @@ This project is provided "as is" without warranty of any kind, express or implie
 3. Any loss, harm, or issues arising from the use or misuse of this open-source software.
 
 Users and contributors are encouraged to engage responsibly and to ensure compliance with applicable laws and regulations. If you believe that any aspect of this project infringes upon your intellectual property or other rights, please contact the developers to resolve the matter promptly.
+
+[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-green.png" width="237" height="77">](https://buymeacoffee.com/gracefulcode)
