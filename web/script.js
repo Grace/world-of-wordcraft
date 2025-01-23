@@ -28,6 +28,13 @@ function connectWebSocket() {
         try {
             const data = JSON.parse(event.data);
             console.log('Parsed message:', data);
+            
+            // Handle theme changes
+            if (data.type === 'theme' && data.data?.theme) {
+                document.documentElement.setAttribute('data-theme', data.data.theme);
+                localStorage.setItem('theme', data.data.theme);
+            }
+            
             appendToOutput(data.message);
         } catch (e) {
             console.error('Failed to parse message:', e);
