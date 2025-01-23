@@ -1,59 +1,37 @@
 from .command import Command
 from ..network.websocket_message import WebSocketMessage
+from ..network.session_manager import SessionManager
 import logging
 
 logger = logging.getLogger(__name__)
 
 class HelpCommand(Command):
-    def __init__(self):
-        super().__init__(name="help", description="Get help about available commands")
-        self.command_details = {
-            'help': {
-                'usage': 'help <command_name>',
-                'description': 'Shows help for a specific command or lists all commands'
-            },
-            'register': {
-                'usage': 'register <username> <password>',
-                'description': 'Create a new player account'
-            },
-            'login': {
-                'usage': 'login <username> <password>',
-                'description': 'Login to an existing account'
-            },
-            'highcontrast': {
-                'usage': 'highcontrast <on|off>',
-                'description': 'Toggle high contrast mode'
-            },
-            'fontsize': {
-                'usage': 'fontsize <number>',
-                'description': 'Change the font size'
-            },
-            'speech': {
-                'usage': 'speech <on|off>',
-                'description': 'Toggle speech synthesis'
-            }
-        }
+    name = "help"
+    description = "Get help about available commands"
+    requires_login = False
 
-    async def execute(self, args: str) -> WebSocketMessage:
+    HELP_TEXTS = {
+        'help': 'Usage: help [command]\nGet help about commands',
+        'login': 'Usage: login <username> <password>\nLogin to your account',
+        'register': 'Usage: register <username> <password>\nCreate a new account',
+        'logout': 'Usage: logout\nLog out of your account',
+        'look': 'Usage: look\nLook around your current location'
+    }
+
+    async def execute(self, args: str, client_id: str, session_manager: SessionManager) -> WebSocketMessage:
         command = args.strip().lower()
+        if command and command in self.HELP_TEXTS:
+            return WebSocketMessage(
+                type='help',
+                message=self.HELP_TEXTS[command]
+            )
         
-        # If no specific command requested, show all commands
-        if not command:
-            help_text = "Available commands:\n\n"
-            for cmd, details in self.command_details.items():
-                help_text += f"{cmd}: {details['description']}\n"
-            help_text += "\nType 'help <command>' for more details about a specific command."
-            return WebSocketMessage(type='help', message=help_text)
-            
-        # Show help for specific command
-        if command in self.command_details:
-            details = self.command_details[command]
-            help_text = f"Command: {command}\n"
-            help_text += f"Usage: {details['usage']}\n"
-            help_text += f"Description: {details['description']}"
-            return WebSocketMessage(type='help', message=help_text)
-            
+        help_text = "Available commands:\n\n"
+        for cmd, help_msg in self.HELP_TEXTS.items():
+            first_line = help_msg.split('\n')[0]
+            help_text += f"{cmd}: {first_line}\n"
+        
         return WebSocketMessage(
-            type='error',
-            message=f"Unknown command: {command}. Type 'help' to see all commands."
+            type='help',
+            message=help_text
         )

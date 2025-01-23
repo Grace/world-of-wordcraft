@@ -2,6 +2,8 @@ import aiosqlite
 import bcrypt
 from pathlib import Path
 import logging
+import re
+from typing import Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -88,3 +90,32 @@ class SQLiteHandler:
             except Exception as e:
                 logger.error(f"Database error during login: {e}")
                 return False, "Error during login"
+
+    async def register_user(self, username: str, password: str) -> Tuple[bool, str]:
+        # Validate username
+        if not re.match(r'^[a-zA-Z0-9_]{3,20}$', username):
+            return False, "Username must be 3-20 characters long and contain only letters, numbers, and underscores"
+
+        # Validate password
+        if len(password) < 6:
+            return False, "Password must be at least 6 characters long"
+
+        try:
+            # Hash password
+            salt = bcrypt.gensalt()
+            hashed = bcrypt.hashpw(password.encode(), salt)
+
+            # Insert new user
+            async with aiosqlite.connect(self.db_path) as db:
+                query = "INSERT INTO players (username, password_hash) VALUES (?, ?)"
+                await db.execute(query, (username, hashed))
+                await db.commit()
+                
+            logger.info(f"New user registered: {username}")
+            return True, "Registration successful"
+
+        except aiosqlite.IntegrityError:
+            return False, "Username already taken"
+        except Exception as e:
+            logger.error(f"Error registering user: {str(e)}")
+            return False, "Registration failed"
