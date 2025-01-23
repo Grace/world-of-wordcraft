@@ -1,17 +1,18 @@
-from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 import json
 
-@dataclass
 class WebSocketMessage:
-    type: str
-    message: str
-    
+    def __init__(self, type: str, message: str, data: Optional[Dict[str, Any]] = None):
+        self.type = type
+        self.message = message
+        self.data = data if data else {}
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'WebSocketMessage':
         return cls(
             type=data.get('type', ''),
-            message=data.get('message', '')
+            message=data.get('message', ''),
+            data=data.get('data', {})
         )
     
     @classmethod
@@ -21,7 +22,8 @@ class WebSocketMessage:
     def to_dict(self) -> Dict[str, Any]:
         return {
             'type': self.type,
-            'message': self.message
+            'message': self.message,
+            'data': self.data
         }
     
     def to_json(self) -> str:

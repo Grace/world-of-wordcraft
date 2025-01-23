@@ -15,7 +15,8 @@ class HelpCommand(Command):
         'login': 'Usage: login <username> <password>\nLogin to your account',
         'register': 'Usage: register <username> <password>\nCreate a new account',
         'logout': 'Usage: logout\nLog out of your account',
-        'look': 'Usage: look\nLook around your current location'
+        'look': 'Usage: look\nLook around your current location',
+        'highcontrast': 'Usage: highcontrast <on|off>\nToggle high contrast theme'  # Add this line
     }
 
     async def execute(self, args: str, client_id: str, session_manager: SessionManager) -> WebSocketMessage:

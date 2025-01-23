@@ -29,6 +29,13 @@ Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! T
 3. Run the server: `python -m app.main`.
 4. Connect to `ws://localhost:5001` using a WebSocket client like `wscat` or point your browser to `localhost:5001`.
 
+Example .env file content:
+```
+OPENAI_API_KEY=<YOUR_OPENAI_API_KEY>
+ENVIRONMENT=development
+LOG_LEVEL=INFO
+```
+
 ## 🤝 Contributing
 
 Contributions encouraged! Whether it's fixing a bug, improving gameplay mechanics, or adding new features, your help is appreciated.
