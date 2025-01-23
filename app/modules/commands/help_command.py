@@ -16,7 +16,12 @@ class HelpCommand(Command):
         'register': 'Usage: register <username> <password>\nCreate a new account',
         'logout': 'Usage: logout\nLog out of your account',
         'look': 'Usage: look\nLook around your current location',
-        'highcontrast': 'Usage: highcontrast <on|off>\nToggle high contrast theme'  # Add this line
+        'highcontrast': 'Usage: highcontrast <on|off>\nToggle high contrast theme',  # Add this line
+        'fontsize': 'Usage: fontsize <number>\nChange the game text font size',
+        'speech': 'Usage: speech <on|off>\nToggle text-to-speech output',
+        'speech-rate': 'Usage: speech-rate <0.1-10>\nChange text-to-speech playback rate',
+        'speech-repeat': 'Usage: speech-repeat\nRepeat all visible game text using text-to-speech',
+        'speech-stop': 'Usage: speech-stop\nStop any ongoing text-to-speech'
     }
 
     async def execute(self, args: str, client_id: str, session_manager: SessionManager) -> WebSocketMessage:

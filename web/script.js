@@ -35,6 +35,35 @@ function connectWebSocket() {
                 localStorage.setItem('theme', data.data.theme);
             }
             
+            // Handle font size changes
+            if (data.type === 'fontsize' && data.data?.fontSize) {
+                output.style.fontSize = `${data.data.fontSize}px`;
+                localStorage.setItem('fontSize', data.data.fontSize);
+            }
+            
+            // Handle speech rate changes
+            if (data.type === 'speech-rate' && data.data?.speechRate) {
+                speechRate = data.data.speechRate;
+                localStorage.setItem('speechRate', speechRate.toString());
+            }
+            
+            // Handle speech repeat
+            if (data.type === 'speech-repeat' && data.data?.repeat) {
+                if ('speechSynthesis' in window && speechEnabled) {
+                    const visibleText = output.textContent;
+                    const utterance = new SpeechSynthesisUtterance(visibleText);
+                    utterance.rate = speechRate;
+                    window.speechSynthesis.speak(utterance);
+                }
+            }
+
+            // Handle speech stop
+            if (data.type === 'speech-stop' && data.data?.stop) {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                }
+            }
+            
             appendToOutput(data.message);
         } catch (e) {
             console.error('Failed to parse message:', e);
@@ -151,8 +180,14 @@ function handleSpeechCommand(command) {
                 appendToOutput("Text-to-speech is not supported in your browser.");
             }
             return true;
+        } else if (parts[1] === 'stop') {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                appendToOutput("Text-to-speech stopped");
+            }
+            return true;
         }
-        appendToOutput("Usage: speech on|off|rate <0.1-10>|repeat");
+        appendToOutput("Usage: speech on|off|rate <0.1-10>|repeat|stop");
         return true;
     }
     return false;

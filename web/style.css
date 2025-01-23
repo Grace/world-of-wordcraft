@@ -66,7 +66,7 @@ html, body {
 }
 
 #output {
-    font-size: 0.875rem;
+    font-size: 1.125rem;
     line-height: 1.6;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -129,7 +129,7 @@ html, body {
     }
 
     #output {
-        font-size: 0.75rem;
+        font-size: 1rem;
     }
 }
 
