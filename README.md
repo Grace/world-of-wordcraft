@@ -27,7 +27,7 @@ Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! T
 ## Local Development
 1. Install dependencies: `pip install -r requirements.txt`.
 2. Add `OPENAI_API_KEY=<your OPENAI API key>`, `JWT_SECRET_KEY=<your secret JWT key>`, and `ENVIRONMENT=development` to a .env file in the root folder.
-3. Run the server: `python -m app.server.py`.
+3. Run the server: `python -m app.server`.
 4. Connect to `ws://localhost:5001` using a WebSocket client like `wscat` or point your browser to `localhost:5001`.
 
 ## 🤝 Contributing

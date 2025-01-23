@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World of Wordcraft</title>
+    <link href="https://unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main id="game" class="nes-container">
+        <h1 id="title" class="nes-text is-primary" tabindex="0">World of Wordcraft</h1>
+        <section id="output-container" class="nes-container is-dark" aria-labelledby="output-label">
+            <h2 id="output-label" class="sr-only">Game Messages</h2>
+            <div id="output" class="nes-text is-primary" aria-live="polite" aria-atomic="true" tabindex="0"></div>
+        </section>
+        <form id="input-form" class="nes-field" aria-labelledby="input-label">
+            <label id="input-label" for="input" class="sr-only">Command Input</label>
+            <div class="input-group">
+                <input 
+                    id="input" 
+                    type="text" 
+                    class="nes-input"
+                    placeholder="Type your command here..." 
+                    autocomplete="off" 
+                    aria-describedby="input-instructions">
+                <button id="send" type="button" class="nes-btn is-primary" aria-label="Send Command">Send</button>
+            </div>
+            <p id="input-instructions" class="sr-only">Press Enter or click Send to submit your command.</p>
+        </form>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
