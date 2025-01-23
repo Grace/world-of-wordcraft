@@ -1,4 +1,3 @@
-from typing import Dict, Any
 import logging
 
 from .database_service import DatabaseService

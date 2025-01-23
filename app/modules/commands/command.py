@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from ..network.websocket_message import WebSocketMessage
 from ..network.session_manager import SessionManager
-from typing import Optional
 
 class Command(ABC):
     name = ""

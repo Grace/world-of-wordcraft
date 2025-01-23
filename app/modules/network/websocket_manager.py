@@ -2,7 +2,6 @@ from fastapi import WebSocket
 from .connection_manager import ConnectionManager
 from .session_manager import SessionManager
 from .command_handler import CommandHandler
-from ..commands.command_registry import CommandRegistry
 from .websocket_message import WebSocketMessage
 from ..constants import WELCOME_MESSAGE
 import logging

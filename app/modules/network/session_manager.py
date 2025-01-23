@@ -1,4 +1,4 @@
-from typing import Dict, Any, Set, Optional
+from typing import Dict, Any, Optional
 import logging
 from ...modules.roles import Role
 

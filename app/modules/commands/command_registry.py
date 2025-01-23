@@ -1,4 +1,3 @@
-import importlib
 import logging
 import re
 from typing import Dict, Type, Optional
@@ -59,7 +58,7 @@ class CommandRegistry:
                 logger.info(f"Registered command: {cmd_name}")
                 
             except Exception as e:
-                logger.error(f"Error registering command {cmd_name}: {e}", exc_info=True)
+                logger.error(f"Error registering command {cmd_name}: {e}")
 
         logger.info(f"Available commands: {', '.join(self._commands.keys())}")
 
