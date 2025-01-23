@@ -9,3 +9,5 @@ PyJWT==2.3.0
 uvicorn==0.22.0
 websockets==11.0.3
 starlette~=0.27.0
+aiosqlite==0.20.0
+bcrypt==4.2.1

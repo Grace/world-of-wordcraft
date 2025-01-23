@@ -4,9 +4,7 @@ CREATE TABLE IF NOT EXISTS players (
     name TEXT NOT NULL COLLATE NOCASE UNIQUE,
     name_original TEXT NOT NULL,
     password_hash TEXT NOT NULL,
-    location_x INTEGER DEFAULT 0,
-    location_y INTEGER DEFAULT 0,
-    location_z INTEGER DEFAULT 0,
+    location TEXT DEFAULT '0,0,0'
     inventory TEXT DEFAULT '[]',
     role_id TEXT DEFAULT 'player' REFERENCES roles(id)
 );

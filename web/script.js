@@ -19,47 +19,31 @@ function connectWebSocket() {
     ws = new WebSocket(wsUrl);
     
     ws.onopen = () => {
-        console.log("WebSocket connection established");
-        const token = localStorage.getItem('auth_token');
-        if (token) {
-            ws.send(JSON.stringify({
-                type: 'token_auth',
-                token: token
-            }));
-        }
+        console.log('Connected to server');
+        appendToOutput('Connected to server...');
     };
-
+    
     ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        
-        switch(data.type) {
-            case "auth_success":
-                if (data.token) {
-                    localStorage.setItem('auth_token', data.token);
-                }
-                appendToOutput(data.message);
-                break;
-                
-            case "logout":
-                localStorage.removeItem('auth_token');
-                appendToOutput("Logged out successfully");
-                break;
-                
-            case "error":
-                appendToOutput(`Error: ${data.message}`);
-                if (data.message.includes("banned")) {
-                    localStorage.removeItem('auth_token');
-                }
-                break;
-                
-            default:
-                appendToOutput(data.message);
+        console.log('Raw message received:', event.data);
+        try {
+            const data = JSON.parse(event.data);
+            console.log('Parsed message:', data);
+            appendToOutput(data.message);
+        } catch (e) {
+            console.error('Failed to parse message:', e);
+            appendToOutput('Error: ' + e.message);
         }
     };
-
+    
     ws.onclose = () => {
-        console.log("WebSocket connection closed");
+        console.log('Disconnected from server');
+        appendToOutput('Disconnected from server. Reconnecting...');
         setTimeout(connectWebSocket, 1000);
+    };
+    
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        appendToOutput('Connection error occurred');
     };
 }
 
