@@ -7,7 +7,6 @@
 
 Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! This open-source project allows players to explore a procedurally generated world of words and interact in real time.
 
-
 **Note:**  
 - If you encounter disconnections or errors, simply refresh the page and try again after a minute. The app may go into sleep mode during periods of low traffic to conserve resources.  
 - For the best experience, use a modern browser with WebSocket support enabled.
@@ -68,6 +67,8 @@ To contribute:
 - [ ] **Text-to-speech Customization**: Add user controls to adjust how far back the built-in text-to-speech repeats from output history.
 - [ ] **Accessibility Tests**: Test website and gameplay accessibiity with real speech readers and voice to text software for user input
 
+---
+
 ## Disclaimer
 This project, **World of Wordcraft**, is an independent, open-source text-based game developed as an experimental exploration of AI's role in generating interactive textual game content. It is not affiliated with, endorsed by, or associated with Blizzard Entertainment or any other entity that holds trademarks or intellectual property rights for similarly named or related works. The use of the name is intended as a lighthearted pun and is not intended to cause confusion or infringe upon any existing trademarks or intellectual property.
 
@@ -79,5 +80,7 @@ This project is provided "as is" without warranty of any kind, express or implie
 3. Any loss, harm, or issues arising from the use or misuse of this open-source software.
 
 Users and contributors are encouraged to engage responsibly and to ensure compliance with applicable laws and regulations. If you believe that any aspect of this project infringes upon your intellectual property or other rights, please contact the developers to resolve the matter promptly.
+
+---
 
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-green.png" width="237" height="77">](https://buymeacoffee.com/gracefulcode)
