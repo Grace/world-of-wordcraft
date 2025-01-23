@@ -1,8 +1,8 @@
 from ..command import Command
-from ..roles import Role
+from ...roles import Role
 from ...network.websocket_message import WebSocketMessage
 from ...network.session_manager import SessionManager
-from ..decorators import required_roles
+from ...decorators import required_roles
 from ...constants import WELCOME_MESSAGE
 import logging
 
