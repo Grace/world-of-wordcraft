@@ -12,36 +12,40 @@ from .logging_config import setup_logging
 from .modules.database.sqlite_handler import SQLiteHandler
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
+from typing import Optional
 
 logger = setup_logging()
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup
-    db = SQLiteHandler()
-    await db.init_db()
-    logger.info("Database initialized")
-    yield
-    # Shutdown
-    await db.close()
-
 class GameServer:
+    _instance: Optional['GameServer'] = None
+    
+    @classmethod
+    def get_instance(cls) -> 'GameServer':
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
     def __init__(self):
-        self.app = FastAPI(lifespan=lifespan)
+        if GameServer._instance is not None:
+            raise RuntimeError("Use GameServer.get_instance()")
+            
+        self.app = FastAPI()
         self.websocket_manager = WebSocketManager()
         self.db = SQLiteHandler()
-        self._setup_middleware()
+        self._setup_app()
+
+    def _setup_app(self):
+        @asynccontextmanager
+        async def lifespan(app: FastAPI):
+            await self.db.init_db()
+            logger.info("Database initialized")
+            yield
+            await self.db.close()
+
+        self.app = FastAPI(lifespan=lifespan)
         self._setup_routes()
-    
-    async def startup(self):
-        """Initialize server components"""
-        await self.db.init_db()
-        logger.info("Database initialized")
-    
-    async def shutdown(self):
-        """Cleanup resources"""
-        await self.db.close()
-    
+        self._setup_middleware()
+
     def _setup_middleware(self):
         self.app.add_middleware(
             CORSMiddleware,
@@ -89,10 +93,5 @@ class GameServer:
     def start():
         import uvicorn
         logger.info(f"Starting server on http://{Settings.HOST}:{Settings.PORT}")
-        server = GameServer()
-        uvicorn.run(
-            server.app, 
-            host=Settings.HOST, 
-            port=Settings.PORT,
-            log_level="info"
-        )
+        server = GameServer.get_instance()
+        uvicorn.run(server.app, host=Settings.HOST, port=Settings.PORT)
