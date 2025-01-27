@@ -98,8 +98,8 @@ html, body {
 }
 
 #input::placeholder {
-    color: #45a049;
-    opacity: 0.5;
+    color: #fff;
+    opacity: 0.85;
 }
 
 #send {
