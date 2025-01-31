@@ -36,3 +36,10 @@ class SessionManager:
         if client_id not in self.sessions:
             return False
         return role in self.sessions[client_id]['roles']
+
+    def get_username(self, client_id: str) -> Optional[str]:
+        """Get username for client"""
+        session = self.get_session(client_id)
+        if session:
+            return session.get('username')
+        return None

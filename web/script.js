@@ -63,8 +63,16 @@ function connectWebSocket() {
                     window.speechSynthesis.cancel();
                 }
             }
+
+            if (data.type === 'room_description') {
+                console.log('Room description:', data.message);
+                appendToOutput(data.message);
+                return;
+            }
             
             appendToOutput(data.message);
+            return;
+
         } catch (e) {
             console.error('Failed to parse message:', e);
             appendToOutput('Error: ' + e.message);
