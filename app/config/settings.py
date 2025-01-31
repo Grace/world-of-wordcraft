@@ -9,7 +9,7 @@ class Settings:
     BASE_DIR = Path(__file__).parent.parent.parent
     
     # Web directory at project root level
-    WEB_DIR = BASE_DIR / "web"
+    WEB_DIR = BASE_DIR / "web/built"
     
     ENV = os.getenv('ENVIRONMENT', 'development')
     HOST = "0.0.0.0"

@@ -8,6 +8,7 @@ from ..config.logging_config import setup_logging
 from ..modules.database.sqlite_handler import SQLiteHandler
 from contextlib import asynccontextmanager
 from typing import Optional
+from starlette.staticfiles import StaticFiles
 
 logger = setup_logging()
 
@@ -49,9 +50,9 @@ class GameServer:
             allow_methods=["GET", "POST", "OPTIONS"],
             allow_headers=["*"],
         )
-        
         # Serve static files from app/static directory
-        # self.app.mount("/static", StaticFiles(directory="app/static", html=True), name="static")
+        # self.app.mount("/built", StaticFiles(directory="web/built"), name="built")
+    
     
     def _setup_routes(self):
         @self.app.get("/")

@@ -32,10 +32,9 @@ class RegisterCommand(Command):
         if success:
             # Create session and login user automatically
             session_manager.create_session(client_id, username)
-            # Broadcast starting room description to the newly registered user
             starting_room = self.db.users.room_generator.get_starting_room()
             room_description = starting_room["description"]
-            _message = f'Welcome to World of Wordcraft, {username}! You are now logged in.\n\n{room_description}'
+            _message = f'\nWelcome to World of Wordcraft, {username}! You are now logged in.\n\n{room_description}'
             return WebSocketMessage(
                 type='success',
                 message=_message
