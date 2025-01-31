@@ -173,6 +173,8 @@ cython_debug/
 # Virtual python environment folders
 pyenv/
 myenv/
+venv/
+.venv/
 
 game.db
 .aider*
