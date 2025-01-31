@@ -1,7 +1,6 @@
 import aiosqlite
 from pathlib import Path
 import logging
-import sqlite3
 from contextlib import asynccontextmanager
 
 logger = logging.getLogger(__name__)

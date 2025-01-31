@@ -1,3 +1,5 @@
+from starlette.websockets import WebSocket
+
 from ..command import Command
 from ...database.sqlite_handler import SQLiteHandler
 from ...network.websocket_message import WebSocketMessage
@@ -25,15 +27,18 @@ class RegisterCommand(Command):
             )
 
         username, password = parts
-
         # Attempt registration
         success, message = await self.db.register_user(username, password)
         if success:
             # Create session and login user automatically
             session_manager.create_session(client_id, username)
+            # Broadcast starting room description to the newly registered user
+            starting_room = self.db.users.room_generator.get_starting_room()
+            room_description = starting_room["description"]
+            _message = f'Welcome to World of Wordcraft, {username}! You are now logged in.\n\n{room_description}'
             return WebSocketMessage(
                 type='success',
-                message=f'Welcome to World of Wordcraft, {username}! You are now logged in.'
+                message=_message
             )
 
         return WebSocketMessage(

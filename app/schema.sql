@@ -1,12 +1,13 @@
 -- Initial schema creation
 CREATE TABLE IF NOT EXISTS players (
     id TEXT PRIMARY KEY,
-    name TEXT NOT NULL COLLATE NOCASE UNIQUE,
-    name_original TEXT NOT NULL,
+    username TEXT NOT NULL COLLATE NOCASE UNIQUE,
     password_hash TEXT NOT NULL,
-    location TEXT DEFAULT '0,0,0'
+    location TEXT DEFAULT '0,0,0',
     inventory TEXT DEFAULT '[]',
-    role_id TEXT DEFAULT 'player' REFERENCES roles(id)
+    role_id TEXT DEFAULT 'player' REFERENCES roles(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS rooms (
@@ -40,5 +41,5 @@ CREATE TABLE IF NOT EXISTS banned_players (
 );
 
 -- Add indexes for performance
-CREATE INDEX IF NOT EXISTS idx_player_name ON players(name COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS idx_player_name ON players(username COLLATE NOCASE);
 CREATE INDEX IF NOT EXISTS idx_room_coordinates ON rooms(coordinates);

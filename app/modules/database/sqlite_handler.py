@@ -1,9 +1,8 @@
-import aiosqlite
-import bcrypt
-from pathlib import Path
 import logging
-import re
 from typing import Tuple
+
+from starlette.websockets import WebSocket
+
 from .db_connection import DatabaseConnection
 from .user_repository import UserRepository
 
@@ -15,7 +14,16 @@ class SQLiteHandler:
         self.users = UserRepository(self.db)
 
     async def init_db(self):
-        await self.users.create_tables()
+        try:
+            async with self.db.connect() as conn:
+                with open('app/schema.sql', 'r') as f:
+                    schema_sql = f.read()
+                await conn.executescript(schema_sql)
+                await conn.commit()
+            logger.info("Database initialized with schema")
+        except Exception as e:
+            logger.error(f"Error initializing database: {e}")
+            raise
 
     async def register_user(self, username: str, password: str) -> Tuple[bool, str]:
         return await self.users.create_user(username, password)
