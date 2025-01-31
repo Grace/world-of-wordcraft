@@ -175,6 +175,8 @@ pyenv/
 myenv/
 venv/
 .venv/
+app.log
 
+schema.sql
 game.db
 .aider*

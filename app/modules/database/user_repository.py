@@ -12,17 +12,17 @@ class UserRepository:
 
     async def create_tables(self):
         try:
-            conn = await self.db.connect()
-            await conn.execute("""
-                CREATE TABLE IF NOT EXISTS players (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT UNIQUE NOT NULL,
-                    password_hash BLOB NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    last_login TIMESTAMP
-                )
-            """)
-            await conn.commit()
+            async with self.db.connect() as conn:
+                await conn.execute("""
+                    CREATE TABLE IF NOT EXISTS players (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        username TEXT UNIQUE NOT NULL,
+                        password_hash BLOB NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        last_login TIMESTAMP
+                    )
+                """)
+                await conn.commit()
             logger.info("Database tables created successfully")
         except Exception as e:
             logger.error(f"Error creating tables: {e}")
@@ -36,14 +36,13 @@ class UserRepository:
             # Hash password and store as bytes
             salt = bcrypt.gensalt()
             hashed = bcrypt.hashpw(password.encode(), salt)
-            
-            conn = await self.db.connect()
-            await conn.execute(
-                "INSERT INTO players (username, password_hash) VALUES (?, ?)",
-                (username, hashed)
-            )
-            await conn.commit()
-            return True, "User created successfully"
+            async with self.db.connect() as conn:
+                await conn.execute(
+                    "INSERT INTO players (username, password_hash) VALUES (?, ?)",
+                    (username, hashed)
+                )
+                await conn.commit()
+                return True, "User created successfully"
             
         except Exception as e:
             logger.error(f"Error creating user: {e}")
@@ -51,12 +50,12 @@ class UserRepository:
 
     async def verify_user(self, username: str, password: str) -> Tuple[bool, str]:
         try:
-            conn = await self.db.connect()
-            cursor = await conn.execute(
-                "SELECT password_hash FROM players WHERE username = ?",
-                (username,)
-            )
-            row = await cursor.fetchone()
+            async with self.db.connect() as conn:
+                cursor = await conn.execute(
+                    "SELECT password_hash FROM players WHERE username = ?",
+                    (username,)
+                )
+                row = await cursor.fetchone()
             
             if not row:
                 return False, "Invalid username or password"
