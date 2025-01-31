@@ -180,3 +180,4 @@ app.log
 schema.sql
 game.db
 .aider*
+node_modules/
