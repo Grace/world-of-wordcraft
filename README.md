@@ -7,10 +7,11 @@
 
 Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! This open-source project allows players to explore a procedurally generated world of words and interact in real time.
 
-
 **Note:**  
 - If you encounter disconnections or errors, simply refresh the page and try again after a minute. The app may go into sleep mode during periods of low traffic to conserve resources.  
 - For the best experience, use a modern browser with WebSocket support enabled.
+
+---
 
 ## Features  
 - **Text-to-Speech Accessibility**: Activate with the `speech on` command to narrate game events, offering a more immersive and accessible experience. Replay recent updates with the `speech repeat` command.
@@ -20,11 +21,15 @@ Dive into **World of Wordcraft**, a real-time text-based MMORPG powered by AI! T
 - **Inventory and Trading**: Manage your items and trade seamlessly with other players.
 - **Hierarchical Role System**: Player roles include regular players, moderators, and admins, each with distinct permissions.
 
+---
+
 ## Deployment
 1. Clone the repository.
 2. Create .env file in the root folder of the project
 3. Set up a Railway project and add your `OPENAI_API_KEY` to the .env file.
 4. Run `railway up` to deploy.
+
+---
 
 ## Local Development
 1. Install dependencies: `pip install -r requirements.txt`.
@@ -39,6 +44,8 @@ ENVIRONMENT=development
 LOG_LEVEL=INFO
 ```
 
+---
+
 ## 🤝 Contributing
 
 Contributions encouraged! Whether it's fixing a bug, improving gameplay mechanics, or adding new features, your help is appreciated.
@@ -48,9 +55,11 @@ To contribute:
 2. Create a new branch for your feature or fix.
 3. Submit a pull request with a clear description of your changes.
 
-## Extra Goals
+---
+
+## Future Goals
 - [ ] **Build a Core Game Engine**: Develop a robust game engine to streamline the implementation of all other features and improve maintainability.  
-- [ ] **Enhanced Room Generation**: Ensure room generation dynamically accounts for exits in connected rooms, creating a more cohesive world.  
+- [ ] **Enhanced Room Generation**: Use natural language processing (NLP) to parse procedurally generated room descriptions and identify game entities.
 - [x] **Help Command**: Add a `help` command to provide detailed guidance on all available commands.  
 - [x] **Roles and Privileges**: Implement hierarchical roles such as moderators and admins, each with varying levels of permissions.  
 - [ ] **Editable World Elements**: Allow moderators and admins to modify rooms, NPCs, items, and interactions in-game.  
@@ -66,6 +75,9 @@ To contribute:
 - [ ] **Development Build/Deployment**: Establish a robust build and deployment pipeline to streamline development and testing.  
 - [ ] **Super Big Font**: Enable horizontal scrolling to accommodate players who benefit from larger font sizes
 - [ ] **Text-to-speech Customization**: Add user controls to adjust how far back the built-in text-to-speech repeats from output history.
+- [ ] **Accessibility Tests**: Test website and gameplay accessibiity with real speech readers and voice to text software for user input
+
+---
 
 ## Disclaimer
 This project, **World of Wordcraft**, is an independent, open-source text-based game developed as an experimental exploration of AI's role in generating interactive textual game content. It is not affiliated with, endorsed by, or associated with Blizzard Entertainment or any other entity that holds trademarks or intellectual property rights for similarly named or related works. The use of the name is intended as a lighthearted pun and is not intended to cause confusion or infringe upon any existing trademarks or intellectual property.
@@ -78,3 +90,7 @@ This project is provided "as is" without warranty of any kind, express or implie
 3. Any loss, harm, or issues arising from the use or misuse of this open-source software.
 
 Users and contributors are encouraged to engage responsibly and to ensure compliance with applicable laws and regulations. If you believe that any aspect of this project infringes upon your intellectual property or other rights, please contact the developers to resolve the matter promptly.
+
+---
+
+[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-green.png" width="237" height="77">](https://buymeacoffee.com/gracefulcode)

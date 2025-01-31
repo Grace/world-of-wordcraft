@@ -4,6 +4,8 @@
     --text-primary: #ffffff;
     --border-color: #ffffff;
     --input-bg: #000000;
+    --pixel-font: 'Press Start 2P', cursive;
+    --main-font: Helvetica, Arial, sans-serif;
 }
 
 [data-theme="default"] {
@@ -28,8 +30,16 @@ html, body {
     padding: 0;
     height: 100vh;
     background-color: var(--bg-primary);
-    font-family: 'Press Start 2P', cursive;
+    font-family: var(--main-font);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
     overflow: hidden;
+}
+
+/* Pixel font class for specific elements */
+.pixel-font {
+    font-family: var(--pixel-font);
 }
 
 /* Game container */
@@ -42,13 +52,20 @@ html, body {
     padding: 1rem;
     background-color: var(--bg-secondary);
     border: none !important;
+    font-family: var(--pixel-font);
+    font-size: 1.2rem; /* Increased base font size */
+    letter-spacing: 0.1em;
 }
 
 /* Title styles */
 #title {
     text-align: center;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    line-height: 1.6;
+    font-family: var(--pixel-font);
+    text-transform: uppercase;
+    text-shadow: 2px 2px var(--bg-primary);
 }
 
 /* Output container styles */
@@ -63,6 +80,8 @@ html, body {
     max-width: 100%;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    font-size: 1.2rem;
+    line-height: 1.6;
 }
 
 #output {
@@ -122,10 +141,11 @@ html, body {
 @media (max-width: 768px) {
     #game {
         padding: 0.5rem;
+        font-size: 1rem;
     }
 
     #title {
-        font-size: 1.2rem;
+        font-size: 1.6rem;
     }
 
     #output {
