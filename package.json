@@ -1,7 +1,45 @@
 {
   "devDependencies": {
-    "@types/node": "^22.12.0",
+    "@types/node": "^22.13.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
-  }
+    "typescript": "^5.7.3",
+    "vite": "^6.0.11"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "name": "world-of-wordcraft",
+  "description": "<img width=\"1222\" alt=\"image\" src=\"https://github.com/user-attachments/assets/c2f3576a-0baf-41ca-972d-4446af1453f5\" />",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "acorn": "^8.14.0",
+    "acorn-walk": "^8.3.4",
+    "arg": "^4.1.3",
+    "create-require": "^1.1.1",
+    "diff": "^4.0.2",
+    "make-error": "^1.3.6",
+    "undici-types": "^6.20.0",
+    "uuid": "^11.0.5",
+    "v8-compile-cache-lib": "^3.0.1",
+    "yn": "^3.1.1"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Grace/world-of-wordcraft.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Grace/world-of-wordcraft/issues"
+  },
+  "homepage": "https://github.com/Grace/world-of-wordcraft#readme"
 }

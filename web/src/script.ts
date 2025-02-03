@@ -2,8 +2,12 @@ const output = document.getElementById('output');
 const input = document.getElementById('input') as HTMLInputElement;
 const sendButton = document.getElementById('send');
 const autoScroll = true; // Can be toggled by user preference
-let speechEnabled = localStorage.getItem('speechEnabled') === 'true';
-let speechRate = parseFloat(localStorage.getItem('speechRate') ?? '1.0');
+
+// Add imports at top
+import { SpeechManager } from './SpeechManager';
+
+// Initialize SpeechManager after DOM elements
+const speechManager = new SpeechManager(output as HTMLElement);
 
 // Dynamically determine WebSocket URL
 const wsUrl = 
@@ -45,19 +49,21 @@ function connectWebSocket() {
             
             // Handle speech rate changes
             if (data.type === 'speech-rate' && data.data?.speechRate) {
-                speechRate = data.data.speechRate;
-                localStorage.setItem('speechRate', speechRate.toString());
+                speechManager.setSpeechRate(data.data.speechRate);
+                // speechRate = data.data.speechRate;
+                // localStorage.setItem('speechRate', speechRate.toString());
             }
             
             // Handle speech repeat
             if (data.type === 'speech-repeat' && data.data?.repeat) {
-                if ('speechSynthesis' in window && speechEnabled) {
+                if ('speechSynthesis' in window && speechManager.getSpeechEnabled()) {
                     if (output) {
                         const visibleText = output ? output.textContent : '';
                         if (visibleText) {
-                            const utterance = new SpeechSynthesisUtterance(visibleText || '');
-                            utterance.rate = speechRate;
-                            window.speechSynthesis.speak(utterance);
+                            // const utterance = new SpeechSynthesisUtterance(visibleText || '');
+                            // utterance.rate = speechRate;
+                            // window.speechSynthesis.speak(utterance);
+                            speechManager.repeatVisible();
                         }
                     }
                 }
@@ -122,10 +128,11 @@ function appendToOutput(message: string) {
     scrollToBottom();
     
     // Speak message if text-to-speech enabled
-    if (speechEnabled && 'speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(message);
-        utterance.rate = speechRate;
-        window.speechSynthesis.speak(utterance);
+    if (speechManager.getSpeechEnabled() && 'speechSynthesis' in window) {
+        // const utterance = new SpeechSynthesisUtterance(message);
+        // utterance.rate = speechRate;
+        // window.speechSynthesis.speak(utterance);
+        speechManager.speak(message);
     }
 }
 
@@ -179,43 +186,43 @@ function handleSpeechCommand(command: string): boolean {
     const parts = command.split(' ');
     
     if (parts[0] === 'speech') {
-        if (parts[1] === 'on') {
-            speechEnabled = true;
-            localStorage.setItem('speechEnabled', 'true');
-            appendToOutput("Text-to-speech enabled");
-            return true;
-        } else if (parts[1] === 'off') {
-            speechEnabled = false;
-            localStorage.setItem('speechEnabled', 'false');
-            appendToOutput("Text-to-speech disabled");
-            return true;
-        } else if (parts[1] === 'rate' && parts[2]) {
-            const rate = parseFloat(parts[2]);
-            if (rate >= 0.1 && rate <= 10) {
-                speechRate = rate;
-                localStorage.setItem('speechRate', rate.toString());
-                appendToOutput(`Speech rate set to ${rate}`);
+        switch(parts[1]) {
+            case 'on':
+                speechManager.setSpeechEnabled(true);
+                // localStorage.setItem('speechEnabled', 'true');
+                //appendToOutput("Text-to-speech enabled");
                 return true;
-            }
-        } else if (parts[1] === 'repeat') {
-            if ('speechSynthesis' in window) {
-                const visibleText = output ? output.textContent : '';
-                const utterance = new SpeechSynthesisUtterance(visibleText || '');
-                utterance.rate = speechRate;
-                window.speechSynthesis.speak(utterance);
-            } else {
-                appendToOutput("Text-to-speech is not supported in your browser.");
-            }
-            return true;
-        } else if (parts[1] === 'stop') {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                appendToOutput("Text-to-speech stopped");
-            }
-            return true;
+                
+            case 'off':
+                //speechEnabled = false;
+                speechManager.setSpeechEnabled(false);
+                // localStorage.setItem('speechEnabled', 'false');
+                //appendToOutput("Text-to-speech disabled");
+                return true;
+                
+            case 'rate':
+                const rate = parseFloat(parts[2]);
+                if (rate >= 0.1 && rate <= 10) {
+                    speechManager.setSpeechRate(rate);
+                    //speechRate = rate;
+                    //localStorage.setItem('speechRate', rate.toString());
+                    //appendToOutput(`Speech rate set to ${rate}`);
+                }
+                return true;
+                
+            case 'repeat':
+                speechManager.repeatVisible();
+                return true;
+                
+            case 'stop':
+                speechManager.stop();
+                //appendToOutput("Text-to-speech stopped");
+                return true;
+                
+            default:
+                appendToOutput("Usage: speech on|off|rate <0.1-10>|repeat|stop");
+                return true;
         }
-        appendToOutput("Usage: speech on|off|rate <0.1-10>|repeat|stop");
-        return true;
     }
     return false;
 }
