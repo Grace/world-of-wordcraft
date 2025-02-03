@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    // Compile with `npx tsc --module ES2020 --moduleResolution bundler`
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
     /* Projects */
